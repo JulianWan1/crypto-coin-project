@@ -1,0 +1,41 @@
+1. App
+1.1 Create personal-coin-api-development.Dockerfile  DONE
+
+2. Create general docker-compose.yaml file
+2.1 Consists of 2 Containers & 1 Volume
+- App (takes dockerfile from no.1)  DONE
+- DB (postgres)  DONE
+- DB Volume  DONE
+
+3. Run the docker-compose file DONE
+
+4. Test if successful
+- Issue with app connecting with PG DB RESOLVED
+- Issue with running db migrations RESOLVED
+
+- SOLUTION:
+  Theory is to:
+  - get localhost to connect with the app in the container (through portforwarding 4000:4000)
+  - get the app in the container to connect to the DB vicariously through the localhost (since the localhost port 5005 is mapped/portforwarded to port 5432 of the db container)
+
+  Let the container app (not localhost) to run the migration through the docker CLI of that container
+  1. Set host.docker.internal as the DB_HOST in .env file for the app's db config in knexfile.ts as that represents the host running docker (aka your local machine IP)
+  2. So the app uses the localhost as a proxy to the DB through localhost:5005
+  3. In turn, anything like db migrations will be called from the app (through the app container's CLI) which will transmit to the container DB via the localhost 
+  4. Don't run migrations from local terminal as that does not run the migration through the containerized app
+
+5. Remigrate to new Docker DB DONE
+  - Set the new DB env settings in the knexfile DONE
+  - To run migrations in containerized app: 
+  npx knex migrate:latest --knexfile database/knexfile.ts
+
+6. Test the db data volumes if persists when: 
+  - stopping docker containers OK
+  - docker compose down and up again OK 
+  - When docker compose down and up, to ensure volume data persists, the directory for the pg data for the db container is as follows:
+  /var/lib/postgresql/data
+
+  hence, named volume for the pg part of the docker compose would be:
+  <name of volume directory on host>:/var/lib/postgresql/data  
+
+7. Git push changes to upstream
