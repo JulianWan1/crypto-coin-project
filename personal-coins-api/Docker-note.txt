@@ -39,3 +39,17 @@
   <name of volume directory on host>:/var/lib/postgresql/data  
 
 7. Git push changes to upstream
+- Nuked (removed) the old (personal-coins-api) repo and replaced it to set crypto-coin-api as the repo 
+(since it includes both the personal-coins-api and the docker compose yaml file outside of it)
+
+8. Ensuring that the docker app always get updated with new file changes
+- Use volumes, point the local file directory to the container's specific directory (e.g. usr/src/app)
+- This mounts the physical host file system to the virtual file system of docker app
+- This way when local/host changes are made, it is reflected on the docker app automatically
+
+9. Create new migration file and run latest migrations from root of app (in this case)
+Creating new migration file
+- npx knex migrate:make <migration file name> --migrations-directory database/migrations
+
+Running new migrations
+- npx knex migrate:latest --knexfile database/knexfile.ts
