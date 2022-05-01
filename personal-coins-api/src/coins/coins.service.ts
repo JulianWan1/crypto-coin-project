@@ -52,7 +52,7 @@ export class CoinsService {
   }
   ]
 
-  async findAll(coinName?: string): Promise<Coin[]> {
+  async findAll(coinName?: string) {
     if(coinName){
       const userCoinList = await this.getCoinDao.getCoin()
       const userCoin = userCoinList.find(coin => coin.coinName === coinName);
@@ -63,7 +63,10 @@ export class CoinsService {
     }
     // const coinList = this.getCoinDao.getCoin
     // return coinList;
-    return this.getCoinDao.getCoin();
+    const coinList:Coin[] = await this.getCoinDao.getCoin();
+    return {
+      data: coinList.map((eachCoin)=>({...eachCoin}))
+    };
   };
 
   async find(id: number): Promise<Coin> {
