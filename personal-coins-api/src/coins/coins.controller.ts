@@ -1,66 +1,47 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
-import { CoinsService } from './coins.service';
-import {
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
-import { Coin } from 'src/entities/coin.entity';
-import { CreateCoinDto } from 'src/dto/create-coin.dto';
-import { UpdateCoinDto } from 'src/dto/update-coin.dto';
+import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
+import { Portfolio } from 'database/models/portfolio';
+import { CreateNewCoinDto } from 'src/dto/create-new-coin.dto';
+import { DuplicateException } from 'src/exceptions/api-exceptions';
+import { CoinsNewService } from './coins-new-coin.service';
 
-@ApiTags('coins')
 @Controller('coins')
 export class CoinsController {
-  constructor(private readonly coinsService: CoinsService) {}
+  private logger = new Logger('CoinsController');
+  constructor(private readonly coinsNewService: CoinsNewService){}
 
-  @ApiOkResponse({ type: Coin, isArray: true })
-  @ApiQuery({ name: 'coinName', required: false })
-  @Get()
-  async findAll(@Query('coinName') coinName: string): Promise<Coin[]> {
-    // How to throw an error (400 Bad Request) when the query param key is mispelled/missing/invalid?
-
-    return this.coinsService.findAll(coinName);
-  }
-
-  @ApiOkResponse({ type: Coin })
-  @Get(':id')
-  async find(@Param('id', ParseIntPipe) id: number): Promise<Coin> {
-    return this.coinsService.find(id);
-  }
-
-  @ApiCreatedResponse({ type: Coin })
-  @Post()
-  async create(@Body() coin: CreateCoinDto): Promise<void> {
-    try {
-      await this.coinsService.create(coin);
-    } catch (err) {
-      console.error(err);
+  @Post('/')
+  async createNewCoin(@Body() coin:CreateNewCoinDto){
+    // Check if the req body has coin name and code that is already registered in portfolio table
+    // to prevent duplicate entry
+    try{
+      const coinIdentityArray:Portfolio[] = await Portfolio
+      .query()
+      .select('coinName', 'coinCode')
+      .returning(['coinName', 'coinCode'],)
+      this.logger.log(`here is coinIdentityArray: ${JSON.stringify(coinIdentityArray)}`);
+      let coinNameArray: string[] = [];
+      let coinCodeArray: string[] = [];
+      for(let coinIdentity of coinIdentityArray){
+        coinNameArray.push(coinIdentity.coinName)
+        coinCodeArray.push(coinIdentity.coinCode)
+        this.logger.log(`coinNameArray: ${coinNameArray}`);
+        this.logger.log(`coinCodeArray: ${coinCodeArray}`);
+      }
+      if(
+        !coinNameArray.includes(coin.coinName) && 
+        !coinCodeArray.includes(coin.coinCode)
+        ){
+        const retrievedCoin =  await this.coinsNewService.createNewCoin(coin)
+        return retrievedCoin
+      }else{
+        return new DuplicateException;
+      }
+    }catch(err){
+      this.logger.log(err);
     }
   }
 
-  @ApiCreatedResponse({ type: Coin })
-  @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() coin: UpdateCoinDto,
-  ): Promise<number> {
-    return this.coinsService.update(id, coin);
-  }
+  @Get()
+  async getAllCoins(): Promise<any>{}
 
-  @Delete(':id')
-  async delete(@Param('id') id: number): Promise<string> {
-    return this.coinsService.delete(id);
-  }
 }

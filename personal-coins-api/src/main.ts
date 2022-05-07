@@ -11,6 +11,7 @@ async function bootstrap() {
   app.enableCors({
     origin: process.env.WEB_PORTAL_DOMAIN
   })
+  app.setGlobalPrefix('v1'); // api version v1
   app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
     .setTitle('Coin API')

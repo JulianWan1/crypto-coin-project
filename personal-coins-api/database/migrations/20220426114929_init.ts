@@ -31,8 +31,8 @@ export async function up(knex: Knex): Promise<void> {
 
 
 export async function down(knex: Knex): Promise<void> {
-  return knex.schema
-    .dropTableIfExists('portfolio')
-    .dropTableIfExists('buy_sell_coin_event');
+  return knex.raw(
+    'DROP TABLE IF EXISTS portfolio, buy_sell_coin_event CASCADE'
+  )
 };
 
