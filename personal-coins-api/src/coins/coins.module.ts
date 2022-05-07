@@ -1,22 +1,14 @@
 import { Module } from '@nestjs/common';
-import { CoinsService } from './coins.service';
+import GeneralBuyEvent from 'src/general-api-functions/general-buy-event';
+import GeneralPortfolioUpdate from 'src/general-api-functions/general-portfolio-update';
 import { CoinsController } from './coins.controller';
-import { CreateCoinDao } from 'src/dao/create-coin.dao';
-import { GetCoinDao } from 'src/dao/get-coin.dao';
-import { CoinDeserializer, CoinSerializer } from 'src/entities/coin.entity';
-import { UpdateCoinDao } from 'src/dao/update-coin.dao';
-import { DeleteCoinDao } from 'src/dao/delete-coin.dao';
-
+import { CoinsNewService } from './coins-new-coin.service';
 @Module({
-  providers: [
-    CoinsService,
-    CreateCoinDao,
-    GetCoinDao,
-    UpdateCoinDao,
-    DeleteCoinDao,
-    CoinDeserializer,
-    CoinSerializer,
-  ],
   controllers: [CoinsController],
+  providers: [
+    CoinsNewService, 
+    GeneralBuyEvent,
+    GeneralPortfolioUpdate,
+  ]
 })
 export class CoinsModule {}

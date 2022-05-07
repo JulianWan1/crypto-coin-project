@@ -1,4 +1,5 @@
 import { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER } from "../src/configurations/env.config";
+import { knexSnakeCaseMappers } from 'objection'
 
 // Update with your config settings.
 module.exports = {
@@ -18,5 +19,6 @@ module.exports = {
     migrations: {
       tableName: 'knex_migrations',
     },
+    ...knexSnakeCaseMappers(),
   },
 };
