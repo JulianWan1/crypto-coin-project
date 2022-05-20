@@ -4,7 +4,7 @@ import { Portfolio } from "database/models/portfolio";
 import { BuySellCoinEventEntity } from "src/entities/buy-sell-coin-event-entity";
 import { EventType } from "src/enum/event-type.enum";
 
-// To update the portfolio whenever a purchase / sell event that leads to a new DCA defining event happens
+// Goal: To update the portfolio whenever a purchase / sell event that leads to a new DCA defining event happens
 // 1. Get all the events based on coinId from event table
 // 2. Retrieve all the latest events from target coin, ranging from the latest DCA defining event till the most recent buy event
 // 3. From the list, 
@@ -51,7 +51,7 @@ export default class GeneralPortfolioUpdate{
     // get the latest DCA Defining Event from the listOfDCADefiningEvents using eventDate
     let latestDefiningDCAEvent: BuySellCoinEvent =
       listOfDCADefiningEvents.reduce((previous, current) => {
-        return new Date(previous.eventDate) > new Date(current.eventDate) ? previous : current;
+        return new Date(previous.eventDate).getTime() > new Date(current.eventDate).getTime() ? previous : current;
       });
     this.logger.log(`latestDefiningDCAEvent: ${JSON.stringify(latestDefiningDCAEvent)}`);
 
@@ -67,8 +67,8 @@ export default class GeneralPortfolioUpdate{
     let totalBuyQuantity: number = 0;
     let totalSellQuantity: number = 0;
     for(let buySellEvent of buySellEventList){
-      totalBuyQuantity += buySellEvent.buyQuantity;
-      totalSellQuantity += buySellEvent.sellQuantity
+      totalBuyQuantity += Number(buySellEvent.buyQuantity);
+      totalSellQuantity += Number(buySellEvent.sellQuantity);
     }
     let calculatedCurrentAmountOwned: number = totalBuyQuantity - totalSellQuantity;
 
@@ -107,18 +107,18 @@ export default class GeneralPortfolioUpdate{
     this.logger.log(`allSoldEventsList: ${JSON.stringify(allSoldEventsList)}`)
 
     let totalWeightedSells: number = 0;
-    let calculatedCurrenDollarSoldAverage: number = 0;
+    let calculatedDollarSoldAverage: number = 0;
     for(let sellEvent of allSoldEventsList){
-      totalWeightedSells += (sellEvent.sellQuantity * sellEvent.marketPrice);
+      totalWeightedSells += (sellEvent.sellQuantity * sellEvent.aggregatePrice);
     }
     if(totalSellQuantity !== 0){
-      calculatedCurrenDollarSoldAverage = totalWeightedSells / totalSellQuantity;
+      calculatedDollarSoldAverage = totalWeightedSells / totalSellQuantity;
     }
 
   // 3.5 Calculate realisedProfitLossPercentage (if a sell event is present in coinEventList)
   // Get every sell event's
   // - amount of coins sold (SC)
-  // - aggregate price of coins sold (essentially the market price) (DSA)
+  // - aggregate price of coins sold (essentially the effective selling price per coin) (DSA)
   // - aggregate price of coins bought preceeding sell event 
   // (retrieved from the aggregate price of recent defined DCA after the sell event) (DCA)
     let totalPLPercentageNumerator: number = 0;
@@ -126,15 +126,20 @@ export default class GeneralPortfolioUpdate{
     let calculatedRealisedProfitLossPercentage: number = 0;
     if(allSoldEventsList.length > 0){
       for(let sellEvent of allSoldEventsList){
-          let correspondingDefinedDCAEvent: BuySellCoinEvent;
+          let correspondingDefinedDCAEvent: BuySellCoinEvent | null = null;
           for(let definedDCAEvent of listOfDCADefiningEvents){
-            if(definedDCAEvent.eventDate === sellEvent.eventDate){
+            this.logger.log(`definedDCAEvent date === sellEvent date? : ${new Date(definedDCAEvent.eventDate).getTime()  === new Date(sellEvent.eventDate).getTime()}`)
+            if(new Date(definedDCAEvent.eventDate).getTime() === new Date (sellEvent.eventDate).getTime()){
               correspondingDefinedDCAEvent = definedDCAEvent
             }
           }
+          this.logger.log(`sellEventFromLoop: ${JSON.stringify(sellEvent)}`)
+          this.logger.log(`correspondingDefinedDCAEvent: ${JSON.stringify(correspondingDefinedDCAEvent)}`)
         totalPLPercentageNumerator += ((sellEvent.sellQuantity) * (sellEvent.aggregatePrice - correspondingDefinedDCAEvent.aggregatePrice))
         totalPLPercentageDenominator += (sellEvent.sellQuantity * correspondingDefinedDCAEvent.aggregatePrice)
       }
+      this.logger.log(`totalPLPercentageNumerator: ${totalPLPercentageNumerator}`);
+      this.logger.log(`totalPLPercentageDenominator: ${totalPLPercentageDenominator}`);
       if(totalPLPercentageDenominator !== 0){
         calculatedRealisedProfitLossPercentage = totalPLPercentageNumerator / totalPLPercentageDenominator
       }
@@ -147,10 +152,11 @@ export default class GeneralPortfolioUpdate{
       .patch({
         currentAmountOwned: calculatedCurrentAmountOwned,
         currentDollarCostAverage: calculatedCurrentDollarCostAverage,
-        dollarSoldAverage: calculatedCurrenDollarSoldAverage,
+        dollarSoldAverage: calculatedDollarSoldAverage,
         totalBought: totalBuyQuantity,
         totalSold: totalSellQuantity,
-        realisedProfitLossPercentage: calculatedRealisedProfitLossPercentage
+        realisedProfitLossPercentage: calculatedRealisedProfitLossPercentage,
+        updatedAt: new Date()
       });
   }
   

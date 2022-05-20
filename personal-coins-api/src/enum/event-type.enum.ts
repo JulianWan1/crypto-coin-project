@@ -1,5 +1,5 @@
 export enum EventType {
-  BuyEventType = 0,
-  SellEventType = 1,
-  RecentDCADefiningEventType = 2
+  BuyEventType = 2,
+  SellEventType = 0,
+  RecentDCADefiningEventType = 1
 }
