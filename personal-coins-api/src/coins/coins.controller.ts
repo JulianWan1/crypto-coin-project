@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Patch, Post } from '@nestjs/common';
 import { Portfolio } from 'database/models/portfolio';
 import { CreateNewEventDto } from 'src/dto/create-new-event.dto';
+import { UpdateEventDto } from 'src/dto/update-event.dto';
 import { DuplicateException } from 'src/exceptions/api-exceptions';
 import { NewBuySellAdded, NewCoinAdded } from 'src/models/coin-related.model';
 import { CoinsBuyService } from './coins-buy.service';
+import { CoinsEventUpdateService } from './coins-event-update.service';
 import { CoinsNewService } from './coins-new-coin.service';
 import { CoinsSellService } from './coins-sell.service';
 
@@ -13,7 +15,8 @@ export class CoinsController {
   constructor(
     private readonly coinsNewService: CoinsNewService,
     private readonly coinsBuyService: CoinsBuyService,
-    private readonly coinsSellService: CoinsSellService
+    private readonly coinsSellService: CoinsSellService,
+    private readonly coinsEventUpdateService: CoinsEventUpdateService
     ){}
 
   @Post('/')
@@ -62,9 +65,23 @@ export class CoinsController {
   @Post('sell/:coinName')
   async createSellEvent(
   @Param('coinName') coinName: string,
-  @Body() coin:CreateNewEventDto){
+  @Body() coin:CreateNewEventDto
+  ){
 
     return await this.coinsSellService.createNewSell(coinName, coin);
+
+  }
+
+  // PATCH and not PUT as the update is not necessarily meant to update the all of the fields of an event log
+  // PATCH only updates the fields that were supplied, leaving the others alone.
+  // hence all fields/params of an event are not required to be in the request body
+  @Patch('update/:eventId')
+  async updateBuySellEvent(
+  @Param('eventId') eventId: number,
+  @Body() buySellEvent:UpdateEventDto
+  ){
+
+    return await this.coinsEventUpdateService.updateEventLog(eventId, buySellEvent)
 
   }
 
