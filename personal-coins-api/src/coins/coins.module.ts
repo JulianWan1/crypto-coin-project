@@ -8,6 +8,7 @@ import { CoinsBuyService } from './coins-buy.service';
 import GeneralSellEvent from 'src/general-api-functions/general-sell-event';
 import GeneralEventLogUpdate from 'src/general-api-functions/general-event-log-update';
 import GeneralDCADefiningEvent from 'src/general-api-functions/general-dca-defining-event';
+import { CoinsEventUpdateService } from './coins-event-update.service';
 
 @Module({
   controllers: [CoinsController],
@@ -20,6 +21,7 @@ import GeneralDCADefiningEvent from 'src/general-api-functions/general-dca-defin
     GeneralDCADefiningEvent,
     GeneralEventLogUpdate,
     GeneralPortfolioUpdate,
+    CoinsEventUpdateService
   ]
 })
 export class CoinsModule {}
