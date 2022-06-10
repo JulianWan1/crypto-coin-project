@@ -1,7 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { BuySellCoinEvent } from "database/models/buy-sell-coin-event";
 import { Portfolio } from "database/models/portfolio";
-import { stringify } from "querystring";
 import { UpdateEventDto } from "src/dto/update-event.dto";
 import { EventType } from "src/enum/event-type.enum";
 import { AbsentException, AfterFirstBoughtException, BeforeFirstBoughtException, EventLogNotFoundException, ExceedingOwnedFromSpilloverException, MissingUpdatesException, NoneOrNegativeBuySellAmount, SellEventDateNotUniqueException, UpdateDCAEventException } from "src/exceptions/api-exceptions";
@@ -377,7 +376,8 @@ export class CoinsEventUpdateService{
           marketPrice: marketPrice ? marketPrice : eventLog.marketPrice,
           networkFee: networkFee ? networkFee : eventLog.networkFee,
           exchangePremium: exchangePremium ? exchangePremium : eventLog.exchangePremium,
-          aggregatePrice: newAggregatePrice
+          aggregatePrice: newAggregatePrice,
+          updatedAt: new Date()
       })
     for(let i = 0; i < testingDCAEventsList.length; i++){
       await BuySellCoinEvent.query()
@@ -386,7 +386,8 @@ export class CoinsEventUpdateService{
         {
           buyQuantity: testingDCAEventsList[i].buyQuantity,
           aggregatePrice: testingDCAEventsList[i].aggregatePrice,
-          eventDate: testingDCAEventsList[i].eventDate
+          eventDate: testingDCAEventsList[i].eventDate,
+          updatedAt: new Date()
         }
       )
     }

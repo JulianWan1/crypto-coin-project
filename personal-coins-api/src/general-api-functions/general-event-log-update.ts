@@ -124,7 +124,8 @@ export default class GeneralEventLogUpdate {
           .patchAndFetchById(currentDCAEvent.id,
             {
             buyQuantity:newDCAbuyQuantity,
-            aggregatePrice: newSellDCA
+            aggregatePrice: newSellDCA,
+            updatedAt: new Date()
           })
       // update the DCA Event in coinEventLog list with newlyUpdatedDCAEvent of similar id 
       // to ensure that the DCA event prior to the current DCA event (previousDCAEvent) for the next iteration of this loop is updated
