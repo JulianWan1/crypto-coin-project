@@ -92,7 +92,7 @@ export class ExceedingTotalBoughtException extends HttpException {
 export class ExceedingOwnedFromSpilloverException extends HttpException {
   constructor(currentDCAEventDate:Date,currentSellEventDate:Date){
     super(
-      `Potential sell event quantity causes total coins owned in a range to be lesser than the coins to be sold subsequently, range where issue starts is from ${currentDCAEventDate} to ${currentSellEventDate}. Sell event is prohibited, advise is to revise the logs correctly and try again`,
+      `Potential sell event quantity causes total coins owned in a range to be lesser than the coins to be sold subsequently, range where issue starts is from ${currentDCAEventDate} to ${currentSellEventDate}. Addition/update/deletion of event is prohibited, advise is to revise the logs correctly and try again`,
       HttpStatus.FORBIDDEN
     );
   }
@@ -102,6 +102,14 @@ export class MissingUpdatesException extends HttpException {
   constructor(){
     super(
       'Updates are missing/not passed, update is prohibited',
+      HttpStatus.FORBIDDEN
+    );
+  }
+}
+export class FirstBuyOrDCAEventDeletionException extends HttpException {
+  constructor(){
+    super(
+      'First buy event or DCA event type is not allowed to be deleted, deletion is prohibited',
       HttpStatus.FORBIDDEN
     );
   }

@@ -1,11 +1,14 @@
-import { Body, Controller, Get, Logger, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
 import { Portfolio } from 'database/models/portfolio';
 import { CreateNewEventDto } from 'src/dto/create-new-event.dto';
 import { UpdateEventDto } from 'src/dto/update-event.dto';
 import { DuplicateException } from 'src/exceptions/api-exceptions';
 import { NewBuySellAdded, NewCoinAdded } from 'src/models/coin-related.model';
 import { CoinsBuyService } from './coins-buy.service';
+import { CoinsDeleteService } from './coins-delete.service';
+import { CoinsEventDeleteService } from './coins-event-delete.service';
 import { CoinsEventUpdateService } from './coins-event-update.service';
+import { CoinsGetService } from './coins-get.service';
 import { CoinsNewService } from './coins-new-coin.service';
 import { CoinsSellService } from './coins-sell.service';
 
@@ -16,7 +19,10 @@ export class CoinsController {
     private readonly coinsNewService: CoinsNewService,
     private readonly coinsBuyService: CoinsBuyService,
     private readonly coinsSellService: CoinsSellService,
-    private readonly coinsEventUpdateService: CoinsEventUpdateService
+    private readonly coinsEventUpdateService: CoinsEventUpdateService,
+    private readonly coinsEventDeleteService: CoinsEventDeleteService,
+    private readonly coinsDeleteService: CoinsDeleteService,
+    private readonly coinsGetService: CoinsGetService
     ){}
 
   @Post('/')
@@ -81,11 +87,43 @@ export class CoinsController {
   @Body() buySellEvent:UpdateEventDto
   ){
 
-    return await this.coinsEventUpdateService.updateEventLog(eventId, buySellEvent)
+    return await this.coinsEventUpdateService.updateEventLog(eventId, buySellEvent);
 
   }
 
-  @Get()
-  async getAllCoins(): Promise<any>{}
+  // Delete the coin from portfolio & all events associated with it
+  @Delete('delete/:coinName')
+  async deleteCoin(
+    @Param('coinName') coinName: string
+  ){
+
+    return await this.coinsDeleteService.deleteCoin(coinName);
+
+  }
+
+  // Delete a specifc event for a specific coin from the BuySellEvent table
+  @Delete('delete/:coinName/:eventId')
+  async deleteBuySellEvent(
+    @Param('coinName') coinName: string,
+    @Param('eventId') eventId: number
+  ){
+
+    return await this.coinsEventDeleteService.deleteEventLog(coinName, eventId);
+
+  }
+
+  // Get all the coins from the Portfolio table
+  @Get('/')
+  async getAllCoins():Promise<Portfolio[]>{
+    return await this.coinsGetService.getAllPortfolioCoins()
+  }
+
+  // Get all the events for a specific coin
+  @Get(':coinName')
+  async getAllSpecificCoinEvents(
+    @Param('coinName') coinName: string
+  ){
+    return await this.coinsGetService.getAllCoinEvents(coinName)
+  }
 
 }
