@@ -47,7 +47,7 @@ export class NoneOrNegativeBuySellAmount extends HttpException {
 export class BeforeFirstBoughtException extends HttpException {
   constructor(){
     super(
-      'Buy / Sell event requested is before first buy date, request prohibited',
+      'Buy / Sell event requested is before / on the first buy date, request prohibited',
       HttpStatus.FORBIDDEN
     );
   }
@@ -101,7 +101,7 @@ export class ExceedingOwnedFromSpilloverException extends HttpException {
 export class MissingUpdatesException extends HttpException {
   constructor(){
     super(
-      'Updates are missing/not passed, update is prohibited',
+      'Updates are missing/not passed/all field values are same as the current event, update is prohibited',
       HttpStatus.FORBIDDEN
     );
   }

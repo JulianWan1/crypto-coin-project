@@ -4,10 +4,17 @@ import router from "./router";
 import store from "./store";
 import Buefy from "buefy";
 import "buefy/dist/buefy.css";
-
-Vue.use(Buefy);
+import "./settings-for-main/icons" 
 
 Vue.config.productionTip = false;
+
+Vue.use(
+  Buefy, 
+  {
+    defaultIconComponent: 'vue-fontawesome',
+    defaultIconPack: 'fas'
+  }
+);
 
 new Vue({
   router,

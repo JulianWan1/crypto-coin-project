@@ -3,7 +3,7 @@ import { Portfolio } from 'database/models/portfolio';
 import { CreateNewEventDto } from 'src/dto/create-new-event.dto';
 import { UpdateEventDto } from 'src/dto/update-event.dto';
 import { DuplicateException } from 'src/exceptions/api-exceptions';
-import { NewBuySellAdded, NewCoinAdded } from 'src/models/coin-related.model';
+import { MainPagePortfolio, NewBuySellAdded, NewCoinAdded } from 'src/models/coin-related.model';
 import { CoinsBuyService } from './coins-buy.service';
 import { CoinsDeleteService } from './coins-delete.service';
 import { CoinsEventDeleteService } from './coins-event-delete.service';
@@ -114,7 +114,7 @@ export class CoinsController {
 
   // Get all the coins from the Portfolio table
   @Get('/')
-  async getAllCoins():Promise<Portfolio[]>{
+  async getAllCoins():Promise<MainPagePortfolio[]>{
     return await this.coinsGetService.getAllPortfolioCoins()
   }
 

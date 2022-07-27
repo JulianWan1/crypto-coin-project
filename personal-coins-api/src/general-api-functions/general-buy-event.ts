@@ -45,7 +45,10 @@ export default class GeneralBuyEvent {
     const coinEventLog: BuySellCoinEvent[] = 
     await BuySellCoinEvent.query()
     .where('coinId', '=', coinId)
-    .orderBy('eventDate','asc')
+    .orderBy([
+      {column:'eventDate', order:'asc'},
+      {column:'eventType', order:'asc'}
+    ])
 
     // Update the event log table
     await this.generalEventLogUpdate.updateProceedingDCALogs(buyEvent, coinEventLog)

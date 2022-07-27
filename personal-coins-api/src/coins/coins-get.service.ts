@@ -1,7 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { contains } from "class-validator";
 import { BuySellCoinEvent } from "database/models/buy-sell-coin-event";
 import { Portfolio } from "database/models/portfolio";
+import { EventType } from "src/enum/event-type.enum";
 import { AbsentException } from "src/exceptions/api-exceptions";
+import { MainPagePortfolio } from "src/models/coin-related.model";
 
 @Injectable()
 export class CoinsGetService{
@@ -12,7 +15,66 @@ export class CoinsGetService{
     // Get all the coins from portfolio
     const allPortfolioCoins:Portfolio[] =
       await Portfolio.query()
-    return allPortfolioCoins;
+    // Have to set the last bought & sell quantities and dates respectively for each coin
+    // Loop through allPortfolioCoins array
+    // In each iteration:
+    // - set initial variables for the last bought & date, last sold & date (if there is a sell)
+    // - query all the events for the coin
+    // - get all the buy events & sell events
+    // - get the final buy and sell event
+    // - set the variables with the respective final events
+    // - push the entry in mainPagePortfolioCoins
+    // once done, return mainPortfolioCoins as response body
+    let mainPagePortfolioCoins:MainPagePortfolio[] = []
+    for(let i = 0; i < allPortfolioCoins.length; i++){
+      let lastBoughtAmount: number = 0;
+      let lastBoughtDate: Date;
+      let lastSoldAmount: number | null = null;
+      let lastSoldDate: Date | null = null;
+      
+      let selectedCoinId:number = allPortfolioCoins[i].id;
+      let allSelectedCoinEvents: BuySellCoinEvent[] = 
+        await BuySellCoinEvent.query()
+          .where('coinId', '=', selectedCoinId)
+          .orderBy([
+            {column:'eventDate', order:'asc'},
+            {column:'eventType', order:'asc'}
+          ])
+
+      let allSelectedCoinBuyEvents: BuySellCoinEvent[] = [];
+      let allSelectedCoinSellEvents: BuySellCoinEvent[] = [];
+      for(let i = 0; i < allSelectedCoinEvents.length; i++){
+        if(allSelectedCoinEvents[i].eventType === EventType.BuyEventType){
+          allSelectedCoinBuyEvents.push(allSelectedCoinEvents[i]);
+        }else if(allSelectedCoinEvents[i].eventType === EventType.SellEventType){
+          allSelectedCoinSellEvents.push(allSelectedCoinEvents[i]);
+        }
+      }
+      let lastBoughtEvent:BuySellCoinEvent = allSelectedCoinBuyEvents.slice(-1)[0];
+      let lastSoldEvent:BuySellCoinEvent | null = allSelectedCoinSellEvents.length > 0 ? allSelectedCoinSellEvents.slice(-1)[0] : null;
+      this.logger.log(`lastBoughtEvent for coinId ${selectedCoinId}: ${JSON.stringify(lastBoughtEvent)}`);
+      this.logger.log(`lastSoldEvent for coinId ${selectedCoinId}: ${lastSoldEvent === null ? lastSoldEvent : JSON.stringify(lastSoldEvent)}`)
+      if(lastBoughtEvent){
+        lastBoughtAmount = Number(lastBoughtEvent.buyQuantity);
+        lastBoughtDate = lastBoughtEvent.eventDate;
+      }
+      if(lastSoldEvent){
+        lastSoldAmount = Number(lastSoldEvent.sellQuantity);
+        lastSoldDate = lastSoldEvent.eventDate;
+      }
+      
+      let updatedPortfolioCoin:MainPagePortfolio = 
+        {...allPortfolioCoins[i], 
+          lastBoughtAmount, 
+          lastBoughtDate, 
+          lastSoldAmount, 
+          lastSoldDate
+        }
+
+      mainPagePortfolioCoins.push(updatedPortfolioCoin);
+      this.logger.log(`mainPagePortfolioCoins: ${JSON.stringify(mainPagePortfolioCoins)}`);
+    }
+    return mainPagePortfolioCoins;
   };
 
   // 2. Function to get all events for a specific coin

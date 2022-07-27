@@ -35,7 +35,10 @@ export class CoinsEventUpdateService{
     const coinId: number = coinPresentList[0].id;
     const coinEventLog:BuySellCoinEvent[] = await BuySellCoinEvent.query()
       .where('coinId', '=', coinId)
-      .orderBy('eventDate', 'asc')
+      .orderBy([
+        {column:'eventDate', order:'asc'},
+        {column:'eventType', order:'asc'}
+      ])
     this.logger.log(`coinEventLog: ${JSON.stringify(coinEventLog)}`)
     // Check if the event id is found from the coinEventLog
     // Make eventLog a copy of the event that is to be updated
@@ -61,7 +64,8 @@ export class CoinsEventUpdateService{
     }
 
     // 4. Check if eventDate is:
-    // 4.1 Before the first coin buy event date & time (first buy Event being updated is an exception)
+    // 4.1 Before or equal the first coin buy event date & time, return error 
+    // (however if first buy Event being updated, it is an exception)
     // - have to get all buyEvents
     // 4.2 If it's a sell event being updated, ensure the date is unique to the existing log
     let allBuyEvents: BuySellCoinEvent[] = [];  
@@ -73,7 +77,7 @@ export class CoinsEventUpdateService{
     this.logger.log(`allBuyEvents List: ${JSON.stringify(allBuyEvents)}`);
     if(eventDate){
       if(
-        new Date(eventDate).getTime() < 
+        new Date(eventDate).getTime() <= 
         new Date(coinEventLog[0].eventDate).getTime() &&
         Number(eventId) !== Number(allBuyEvents[0].id)
       ){
@@ -97,13 +101,13 @@ export class CoinsEventUpdateService{
 
     //5. Check if the update is feasible through implementing it on the coinEventLog
     // Check for special cases for both buy & sell:
-    // - If Event to update is the first buy event, ensure all buy events and the dca event which shares the same time initially gets updated with new time in coinEventLog
+    // - If Event to update is the first buy event, ensure the dca event which shares the same time initially gets updated with new time in coinEventLog
     // - If Event to update is a sell event, ensure that the dca event proceeding it is updated with the new date as well in coinEventLog
     
     // Special case 1: 
-    // Check if event to update is buy event, the first buy event & eventDate is before the 3rd event (if exists)
+    // Check if event to update is the first buy event & eventDate is before the 3rd event (if exists)
     // If so, if buySellQuantity exists, then update the buyQuantity for the first buy event
-    // Update the date for DCA event sharing the same first buy date with the new date 
+    // Update the date for DCA event sharing the same first buy date & the first buy event with the new date 
     // If no 3rd event (updating the only event which is the 1st buy event in the log), then allow the update
     if(
       eventType === EventType.BuyEventType &&
@@ -116,11 +120,11 @@ export class CoinsEventUpdateService{
         coinEventLog[1].buyQuantity = buySellQuantity;
         this.logger.log(`New buyQuantity of the first buy event: ${coinEventLog[1].buyQuantity}`)
       }
-      // Update the date for the first DCA Event (DCA event prior to the first buy event)
+      // Update the date for the first DCA Event (DCA event prior to the first buy event) & first buy event
       for(let i = 0; i < coinEventLog.length; i++){
         if(
           new Date(coinEventLog[i].eventDate).getTime() === new Date(eventLog.eventDate).getTime() &&
-          coinEventLog[i].eventType === EventType.RecentDCADefiningEventType
+          coinEventLog[i].eventType !== EventType.SellEventType
         ){
           this.logger.log(`For first buy event update, id of the event to be updated: ${coinEventLog[i].id}`)
           this.logger.log(`eventDate of the event to be updated: ${coinEventLog[i].eventDate}`)

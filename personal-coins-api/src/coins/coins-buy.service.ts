@@ -46,17 +46,20 @@ export class CoinsBuyService {
     } = coinPresent[0]
 
     // Get first buy event to get its event date
-    const firstBuyEventList:BuySellCoinEvent[] = 
+    const coinEventList:BuySellCoinEvent[] = 
     await BuySellCoinEvent.query()
     .where('coinId', '=', id)
-    .orderBy('eventDate','asc')
+    .orderBy([
+      {column:'eventDate', order:'asc'},
+      {column:'eventType', order:'asc'}
+    ])
 
-    const firstBuyEvent: BuySellCoinEvent = firstBuyEventList[0];
-    this.logger.log(`buySellDate >= firstBuyEvent.eventDate: ${ new Date(buySellDate).getTime() >= new Date(firstBuyEvent.eventDate).getTime() }`)
+    const firstBuyEvent: BuySellCoinEvent = coinEventList[1];
+    this.logger.log(`buySellDate > firstBuyEvent.eventDate: ${ new Date(buySellDate).getTime() > new Date(firstBuyEvent.eventDate).getTime() }`)
 
-    // check if the new buy event's date is AFTER OR ON the first buy date
+    // check if the new buy event's date is AFTER the first buy date
     // otherwise throw BeforeFirstBoughtException
-    if(new Date(buySellDate).getTime() < new Date(firstBuyEvent.eventDate).getTime()){
+    if(new Date(buySellDate).getTime() <= new Date(firstBuyEvent.eventDate).getTime()){
       throw new BeforeFirstBoughtException;
     };
     
