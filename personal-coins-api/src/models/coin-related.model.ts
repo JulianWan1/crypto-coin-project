@@ -15,3 +15,21 @@ export class NewBuySellAdded{
   coinId: number;
   latestBuySellDate: Date;
 }
+
+export class MainPagePortfolio{
+  id: number;
+  coinName: string;
+  coinCode: string;
+  currentAmountOwned: number | null;
+  currentDollarCostAverage: number | null;
+  dollarSoldAverage: number | null;
+  totalBought: number | null;
+  totalSold: number | null;
+  realisedProfitLossPercentage: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  lastBoughtAmount: number;
+  lastBoughtDate: Date;
+  lastSoldAmount: number | null;
+  lastSoldDate: Date | null;
+}

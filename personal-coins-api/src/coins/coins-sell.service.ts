@@ -43,7 +43,10 @@ export class CoinsSellService {
     const coinEventLog: BuySellCoinEvent[] = 
       await BuySellCoinEvent.query()
       .where('coinId', '=', id)
-      .orderBy('eventDate','asc')
+      .orderBy([
+        {column:'eventDate', order:'asc'},
+        {column:'eventType', order:'asc'}
+      ])
     const firstDCADefiningEvent: BuySellCoinEvent = coinEventLog[0];
     this.logger.log(`firstDCADefiningEvent: ${JSON.stringify(firstDCADefiningEvent)}`)
 

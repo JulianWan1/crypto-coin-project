@@ -2,6 +2,23 @@ version: '3'
 
 services:
 
+  coin_app_frontend:
+    build:
+      context: ./personal-coins-frontend/
+      dockerfile: .personal-coins-frontend-development.Dockerfile
+    env_file:
+      - ./personal-coins-frontend/.env
+    working_dir: /app
+    ports:
+      - '8080:8080'
+    container_name: coin_app_frontend
+    volumes:
+      - ./personal-coins-frontend:/app
+      - /app/node_modules
+    environment: 
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - coin_network
   coin_app_api:
     build:
       context: ./personal-coins-api/
@@ -18,7 +35,6 @@ services:
       - ./personal-coins-api:/app
     networks:
       - coin_network
-
   personal-coin-pg-db:
     image: postgres:11.9-alpine
     ports:
