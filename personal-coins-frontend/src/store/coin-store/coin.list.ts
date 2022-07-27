@@ -8,7 +8,7 @@ import {
 } from "vuex-module-decorators";
 import { Endpoints } from "@/endpoints/endpoints";
 import index from "..";
-import axios from "axios";
+import { axios } from "@/utils/axios";
 
 @Module({
   dynamic: true,
@@ -17,17 +17,17 @@ import axios from "axios";
   store: index,
 })
 export class CoinListStore extends VuexModule {
-  list: Array<Coin> = [];
+  portfolioCoinList: Array<Coin> = [];
 
   @Mutation
   mutateList(payload: Array<Coin>) {
-    this.list = payload;
+    this.portfolioCoinList = payload;
   }
 
   @Action
   async getCoinList(): Promise<void> {
     try {
-      const coinList = await axios.get("http://localhost:4000/coins"); // fix this axios and env files
+      const coinList = await axios.get(`${Endpoints.Coins}`); // fix this axios and env files
       const { data } = coinList;
       this.context.commit("mutateList", data);
     } catch (err) {
