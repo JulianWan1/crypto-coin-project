@@ -6,7 +6,7 @@
   >
     <div class="update-coin-event-confirmation-modal-container">
       <div class="update-confirmation-title">
-        Confirm Update(s) for {eventId}?
+        Confirm Update(s) for Event ID #{{eventId}}?
       </div>
       <div class="update-confirmation-message">
       {{updateMessage}}
@@ -44,8 +44,8 @@ export default class UpdateCoinEventConfirmationModal extends Vue {
   @Prop()
   updateMessage!: string;
 
-  // @Prop()
-  // eventId:number;
+  @Prop()
+  eventId!: number;
 
   triggerUpdateConfirmation(){
     this.$emit('triggerUpdateConfirmation');

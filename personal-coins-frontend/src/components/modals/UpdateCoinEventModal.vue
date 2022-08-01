@@ -15,25 +15,25 @@
       </div>
       <div class="coin-details">
         <CoinDetailsModalComponent
-          :coinEventDetails="mainCoinModalDetails"
           :updateEventModalType="true"
+          :coinEventDetails="mainCoinModalDetails"
           :eventDateFromSelectedEvent="eventDateFromSelectedEvent"
           @retrievePartialCoinModalDetails="updateMainCoinModal"
         />
       </div>
       <div class="modal-buttons">
         <button 
-          class="update-button"
-          :disabled="updateButtonStatusIsDisabled"
-          @click="convertAndSubmitData"
-        >
-          Update
-        </button>
-        <button 
           class="cancel-button"
           @click="closeModalFunction"  
         >
           Cancel
+        </button>
+        <button 
+          class="update-button"
+          :disabled="updateButtonStatusIsDisabled"
+          @click="submitDataToCoinEventLogTableComponent"
+        >
+          Update
         </button>
       </div>
     </div>
@@ -116,25 +116,8 @@ export default class UpdateCoinEventModal extends Vue {
     console.log(`mainCoinModalDetails from updateCoinEventModal: ${JSON.stringify(this.mainCoinModalDetails)}`)
   }
 
-// Convert all numerical fields to number type
-  convertAndSubmitData(){
-    // const ignoredKeys = ['dateTime', 'coinType', 'buySellEvent'];
-    // let newData: CoinModalFieldData = this.mainCoinModalDetails as CoinModalFieldData;
-
-    // for (const [key, value] of Object.entries(
-    //   this.mainCoinModalDetails as CoinModalFieldData,
-    // )) {
-    //   if (!ignoredKeys.includes(key)) {
-    //     newData = {
-    //       ...newData,
-    //       [key]: Number(value),
-    //     };
-    //   }
-    // }
-    // this.mainCoinModalDetails = {
-    //   ...this.mainCoinModalDetails,
-    //   ...newData,
-    // };
+  // Send data to the CoinEventLogTableComponent
+  submitDataToCoinEventLogTableComponent(){
     console.log(`Submitted Data to CoinEventLogTable: ${JSON.stringify(this.mainCoinModalDetails)}`)
     this.$emit('triggerUpdate', this.mainCoinModalDetails)
   }

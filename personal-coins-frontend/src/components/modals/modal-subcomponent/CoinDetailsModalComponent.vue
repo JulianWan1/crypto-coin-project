@@ -3,6 +3,7 @@
     <b-field 
       class="field-quantity"
       label="Quantity"
+      message="accepts up to 6 integers and 6 decimal places"
     >
       <b-input 
         type="text" 
@@ -13,6 +14,7 @@
     <b-field 
       class="field-market-price"
       label="Market Price"
+      message="accepts up to 8 integers and 2 decimal places"
     >
       <b-input 
         type="text" 
@@ -23,6 +25,7 @@
     <b-field 
       class="field-network-fee"
       label="Network Fee"
+      message="accepts up to 8 integers and 2 decimal places"
     >
       <b-input 
         type="text" 
@@ -33,6 +36,7 @@
     <b-field 
       class="field-exchange-premium"
       label="Exchange Premium"
+      message="accepts up to 8 integers and 2 decimal places"
     >
       <b-input 
         type="text" 
@@ -122,19 +126,20 @@ export default class CoinDetailsModalComponent extends Vue{
   isDisabled = true;
 
   mounted(){
+    // FOLLOWING MEANT FOR UPDATE EVENTS MODAL ONLY
     // Set the partialCoinModalDetails to have the data from the parent component (coinEventDetails)
     // when mounted
-    this.partialCoinModalDetails = {
-      ...this.coinEventDetails, 
-      dateTime: new Date(this.coinEventDetails.dateTime as Date)
-    }
-    console.log(`From CoinDetailsModalComponent mounted: ${JSON.stringify(this.partialCoinModalDetails)}`)
-    // FOLLOWING MEANT FOR UPDATE EVENTS MODAL ONLY
     // If the modal using this component is the event update modal, set isAnUpdateEventModalType to the prop (which should be true)
     // (So far it is used to set the revert button on or off)
     if(this.updateEventModalType){
+      this.partialCoinModalDetails = {
+        ...this.coinEventDetails, 
+        dateTime: new Date(this.coinEventDetails.dateTime as Date)
+      }
       this.isAnUpdateEventModalType = this.updateEventModalType
     }
+    console.log(`From CoinDetailsModalComponent mounted: ${JSON.stringify(this.partialCoinModalDetails)}`)
+
     // Set the initialDateOfEvent to the selected event row's event date
     // This is also to ensure if any re-mounts (rediting of updates in modal by user)
     // was done, the initialDateOfEvent will always refer to the selected event's event date only
