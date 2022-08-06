@@ -33,3 +33,8 @@ export class MainPagePortfolio{
   lastSoldAmount: number | null;
   lastSoldDate: Date | null;
 }
+
+export class ExistingCoins {
+  coinName: string;
+  coinCode: string
+}
