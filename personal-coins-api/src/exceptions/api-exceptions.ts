@@ -1,5 +1,14 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
 
+export class NoCoinFoundException extends HttpException {
+  constructor(){
+    super(
+      'No such coin exists, submission prohibited. Check if coin name/code exists and letter casing',
+      HttpStatus.FORBIDDEN
+    );
+  }
+}
+
 export class DuplicateException extends HttpException {
   constructor(){
     super(

@@ -1,9 +1,7 @@
 import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
-import { Portfolio } from 'database/models/portfolio';
 import { CreateNewEventDto } from 'src/dto/create-new-event.dto';
 import { UpdateEventDto } from 'src/dto/update-event.dto';
-import { DuplicateException } from 'src/exceptions/api-exceptions';
-import { MainPagePortfolio, NewBuySellAdded, NewCoinAdded } from 'src/models/coin-related.model';
+import { MainPagePortfolio, NewBuySellAdded } from 'src/models/coin-related.model';
 import { CoinsBuyService } from './coins-buy.service';
 import { CoinsDeleteService } from './coins-delete.service';
 import { CoinsEventDeleteService } from './coins-event-delete.service';
@@ -27,34 +25,9 @@ export class CoinsController {
 
   @Post('/')
   async createNewCoin(@Body() coin:CreateNewEventDto){
-    // Check if the req body has coin name and code that is already registered in portfolio table
-    // to prevent duplicate entry
-    try{
-      const coinIdentityArray:Portfolio[] = await Portfolio
-      .query()
-      .select('coinName', 'coinCode')
-      .returning(['coinName', 'coinCode'],)
-      this.logger.log(`here is coinIdentityArray: ${JSON.stringify(coinIdentityArray)}`);
-      let coinNameArray: string[] = [];
-      let coinCodeArray: string[] = [];
-      for(let coinIdentity of coinIdentityArray){
-        coinNameArray.push(coinIdentity.coinName)
-        coinCodeArray.push(coinIdentity.coinCode)
-        this.logger.log(`coinNameArray: ${coinNameArray}`);
-        this.logger.log(`coinCodeArray: ${coinCodeArray}`);
-      }
-      if(
-        !coinNameArray.includes(coin.coinName) && 
-        !coinCodeArray.includes(coin.coinCode)
-        ){
-        const retrievedCoin: NewCoinAdded =  await this.coinsNewService.createNewCoin(coin)
-        return retrievedCoin
-      }else{
-        return new DuplicateException;
-      }
-    }catch(err){
-      this.logger.log(err);
-    }
+
+    return await this.coinsNewService.createNewCoin(coin);
+
   }
 
   // Ensure coinName is LOWERCASE when passed as a param for both buy and sell

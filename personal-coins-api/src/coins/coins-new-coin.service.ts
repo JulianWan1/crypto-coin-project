@@ -4,10 +4,11 @@ import { CreateNewEventDto } from 'src/dto/create-new-event.dto';
 import { Logger } from '@nestjs/common';
 import { EventType } from 'src/enum/event-type.enum';
 import { BuySellCoinEventEntity } from 'src/entities/buy-sell-coin-event-entity';
-import { BuySellCoinEvent } from 'database/models/buy-sell-coin-event';
 import GeneralBuyEvent from 'src/general-api-functions/general-buy-event'
 import GeneralDCADefiningEvent from 'src/general-api-functions/general-dca-defining-event';
-import { NoneOrNegativeBuySellAmount } from 'src/exceptions/api-exceptions';
+import { DuplicateException, NoCoinFoundException, NoneOrNegativeBuySellAmount } from 'src/exceptions/api-exceptions';
+import { existingCoinsList } from 'src/configurations/existing-coins.config';
+import { ExistingCoins } from 'src/models/coin-related.model';
 
 @Injectable()
 export class CoinsNewService {
@@ -27,7 +28,44 @@ export class CoinsNewService {
       buySellDate 
     } = coin;
     
-    // ensure the amount of the buySellQuantity is more than 0
+    // Check if the coin being passed exists
+    // AS OF (06/08/2022): Setting Bitcoin, Ethereum, Cardano, & Solana as the only coins that exists for this app at the moment
+    const existingCoins:ExistingCoins[] = existingCoinsList;
+    let coinFound = existingCoins.find((existingCoin)=>{
+      return (
+        existingCoin.coinName === coinName && 
+        existingCoin.coinCode === coinCode
+      )
+    });
+    this.logger.log(JSON.stringify(coinFound));
+    if(!coinFound){
+      this.logger.log(JSON.stringify(coinFound));
+      throw new NoCoinFoundException;
+    };
+
+    // Check if the req body has coin name and code that is already registered in portfolio table
+    // to prevent duplicate entry
+    const coinIdentityArray:Portfolio[] = await Portfolio
+      .query()
+      .select('coinName', 'coinCode')
+      .returning(['coinName', 'coinCode'],)
+      this.logger.log(`here is coinIdentityArray: ${JSON.stringify(coinIdentityArray)}`);
+      let coinNameArray: string[] = [];
+      let coinCodeArray: string[] = [];
+      for(let coinIdentity of coinIdentityArray){
+        coinNameArray.push(coinIdentity.coinName)
+        coinCodeArray.push(coinIdentity.coinCode)
+        this.logger.log(`coinNameArray: ${coinNameArray}`);
+        this.logger.log(`coinCodeArray: ${coinCodeArray}`);
+      }
+    if(
+      coinNameArray.includes(coinName) ||
+      coinCodeArray.includes(coinCode)
+    ){
+      throw new DuplicateException;
+    }
+
+    // Ensure the amount of the buySellQuantity is more than 0
     if(buySellQuantity <= 0){
       throw new NoneOrNegativeBuySellAmount
     };
