@@ -9,7 +9,7 @@ import {
 import { Endpoints } from "@/endpoints/endpoints";
 import index from "..";
 import { axios } from "@/utils/axios";
-import { MakeBuySellCoinRequestParameter } from "@/models/api-related-model";
+import { BuySellCreateCoinRequestBody, MakeBuySellCoinRequestParameter } from "@/models/api-related-model";
 
 @Module({
   dynamic: true,
@@ -65,6 +65,27 @@ export class CoinListStore extends VuexModule {
         return error.response.data
       }else {
         console.log("data update took too long, potential timeout");
+      }
+    }
+  }
+
+  @Action
+  async makeAddNewCoinRequest(requestBody:BuySellCreateCoinRequestBody): Promise<any> {
+    if(this.isLoading){
+      console.log(`makeAddNewCoinRequest is Loading: ${this.isLoading}`)
+      return;
+    }
+    await this.context.commit('mutateLoadingStatus', true);
+    console.log(`successfully mutateLoadingStatus: ${this.isLoading} `)
+
+    try{
+      const response = await axios.post(`${Endpoints.Coins}`, requestBody)
+      return response;
+    }catch(error:any){
+      if(error){
+        return error.response.data
+      }else {
+        console.log("data submission took too long, potential timeout")
       }
     }
   }

@@ -1,7 +1,7 @@
 <template> 
   <b-modal 
     :active="isActive"
-    :can-cancel="['escape', 'outside']"
+    :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeModalFunction"
   >
     <div
@@ -24,7 +24,8 @@
       <div class="modal-buttons">
         <button 
           class="cancel-button"
-          @click="closeModalFunction"  
+          :disabled="loadingStatus"
+          @click="closeModalFunction"
         >
           Cancel
         </button>
@@ -63,6 +64,9 @@ export default class UpdateCoinEventModal extends Vue {
   @Prop()
   coinName!: string;
 
+  @Prop({default:false})
+  loadingStatus!:boolean;
+
   mainCoinModalDetails:CoinModalFieldData | null = null;
 
   eventId: number | null = null;
@@ -72,6 +76,17 @@ export default class UpdateCoinEventModal extends Vue {
   eventDateFromSelectedEvent: Date | null = null;
 
   updateButtonStatusIsDisabled = false;
+
+  // Whenever loading page is triggered, ensure that update button is disabled
+  // When loading status is finished, set the update button to be active
+  @Watch('loadingStatus')
+  disableEnableSubmitButton(){
+    if(this.loadingStatus){
+      this.updateButtonStatusIsDisabled = true;
+    }else{
+      this.updateButtonStatusIsDisabled = false;
+    }
+  }
 
 // Set the modal data to be of the selected row from table
 // To be sent to the coinDetailsModalComponent as prop

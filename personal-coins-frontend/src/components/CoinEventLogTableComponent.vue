@@ -24,6 +24,7 @@
         :isActive="isUpdateCoinEventModalActive"
         :coinEventDetails="selectedEventRow"
         :coinName="coinName"
+        :loadingStatus="loadingStatus"
         @closeModal="changeModalStatusAndDeselectRow"
         @triggerUpdate="updateCoinEvent"
       />
@@ -36,6 +37,7 @@
         :isActive="isUpdateCoinEventConfirmationModalActive"
         :updateMessage="updateConfirmationMessage"
         :eventId="confirmationEventId"
+        :loadingStatus="loadingStatus"
         @closeConfirmationModal="closeUpdateConfirmationModalAndOpenUpdateModal"
         @triggerUpdateConfirmation="confirmUpdateCoinEvent"
       />

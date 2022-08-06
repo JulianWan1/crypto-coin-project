@@ -68,14 +68,6 @@ export default class BuySellCoinModal extends Vue {
   selectedBuyOrSellOption = 'buy'; // Could use number 2 & 0 instead if required/better practice
   mainCoinModalDetails:CoinModalFieldData | null = null;
 
-  // @Watch('mainCoinModalDetails')
-  // disableBuySellButton(){
-  //   if(!this.mainCoinModalDetails){
-  //     this.buySellButtonStatusIsDisabled = true;
-  //   }
-  // }
-
-
   // Whenever the modal is closed or opened, set:
   // 1. mainCoinModalDetails to null
   // 2. selectedBuyOrSellOption to be 'buy' option
@@ -104,8 +96,6 @@ export default class BuySellCoinModal extends Vue {
   }
 
   closeModalFunction(){
-    // Reset the mainCoinModalDetails to null as to ensure the buy/sell button is disabled when modal is reopened
-    // this.mainCoinModalDetails = null;
     this.$emit(`closeModal`)
   }
 
@@ -122,8 +112,6 @@ export default class BuySellCoinModal extends Vue {
 
   submitBuySellCoinMethod(){
     this.$emit(`triggerBuySellCoinEvent`, this.mainCoinModalDetails, this.selectedBuyOrSellOption);
-    // Reset the mainCoinModalDetails to null as to ensure the buy/sell button is disabled when modal is reopened
-    // this.mainCoinModalDetails = null;
     console.log(`mainCoinModalDetails after buy/sell submission attempt: ${JSON.stringify(this.mainCoinModalDetails)}`)
   }
 
