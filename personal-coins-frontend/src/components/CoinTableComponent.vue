@@ -49,14 +49,9 @@
       class="add-new-coin-modal"
       @click.stop
     >
-    <!-- TODO: Set the listeners and props
-      1. closeModal functionality DONE
-      2. listOfExistingCoins have to be dynamic, retrieved from the coin table 
-      3. isLoading DONE
-     -->
       <AddNewCoinModal
         :isActive="isAddNewCoinModalActive"
-        :listOfExistingCoins="['Bitcoin', 'Ethereum']"
+        :listOfExistingCoins="coinsAlreadyBought"
         :loadingStatus="loadingStatus"
         @closeModal="changeAddNewCoinModalStatus"
         @triggerAddNewCoinEvent="submitAddNewCoinEvent"
@@ -172,9 +167,10 @@
     </b-table>
     <b-button
       v-if="successToast"
-      label="Close Buy/Sell Message"
+      label="Close Message"
       type="is-danger"
       @click="closeToast"
+      v-on-clickaway="closeToast"
     />
     <div 
       class="loading-screen"
@@ -221,6 +217,7 @@ export default class CoinTableComponent extends Vue {
   liveCoinWatchFunctions = new LiveCoinWatchFunctions;
   isBuySellModalActive = false;
   isAddNewCoinModalActive = false;
+  coinsAlreadyBought:string[] = [];
   loadingStatus = false;
   successToast: null | BNoticeComponent = null;
   
@@ -248,6 +245,14 @@ export default class CoinTableComponent extends Vue {
     // Populate the initialPortfolioCoinList variable
     this.initialPortfolioCoinList = this.store.portfolioCoinList;
     console.log(`retrieved initialPortfolioCoinList: `, (JSON.stringify(this.initialPortfolioCoinList)));
+    // Set the coinsAlreadyBought back to an empty string array 
+    // (this will help retrigger the watcher on listOfExistingCoins prop in AddNewCoinModal to reset availableCoinOptionsList within it)
+    this.coinsAlreadyBought = [];
+    // Get all of the names of coins that have been bought and set it to coinsAlreadyBought list
+    for(let i = 0; i < this.initialPortfolioCoinList.length ;i++){
+      this.coinsAlreadyBought.push(this.initialPortfolioCoinList[i].coinName);
+    }
+    console.log(`Coin names of already bought coins: ${JSON.stringify(this.coinsAlreadyBought)}`)
     // Apply the newly populated initialPortfolioCoinList to the currentCoinMarketPriceRetriever to get their respective current coin market price
     await this.currentCoinMarketPriceRetriever(this.initialPortfolioCoinList);
   }
@@ -396,12 +401,12 @@ export default class CoinTableComponent extends Vue {
     this.store.setIsLoadingToFalse();
   }
 
-  // 1. TODO: Submit New Coin Addition
+  // 1. Submit New Coin Addition
     async submitAddNewCoinEvent(mainCoinModalDetails:CoinModalFieldData, selectedCoinOption:Partial<BuySellCreateCoinRequestBody>){
     // Open loading screen
     this.loadingStatus = true;
-    console.log(`submitBuySellCoinEvent's coinName & coinCode ${this.selectedRowCoinName}, ${this.selectedRowCoinCode}`)
-    console.log(`mainCoinModalDetails from submitBuySellCoinEvent: ${JSON.stringify(mainCoinModalDetails)}`)
+    console.log(`submitAddNewCoinEvent's coinName & coinCode: ${this.selectedRowCoinName}, ${this.selectedRowCoinCode}`)
+    console.log(`mainCoinModalDetails from submitAddNewCoinEvent: ${JSON.stringify(mainCoinModalDetails)}`)
     // Set the requestBody that is to be sent to the API in the store
     const{
       quantity,
@@ -429,19 +434,16 @@ export default class CoinTableComponent extends Vue {
     }
   }
 
-  // 2. TODO: Check New Coin Addition Submission Response
+  // 2. Check New Coin Addition Submission Response
   async addNewCoinSuccessOrFailure(response:any){
     // If submission is successful (status 201) (which returns success response), toast, 
     // If submission fails (status 400, 403, 500), return toast with error and keep modal open with error msg
     if(response && response.status === 201){
       console.log(response);
-      // Retrieve the data of the buy sell event and set the message for it
-      const buyOrSellString:string = response.data.latestBuySellEvent.buyQuantity? 'Buy' : 'Sell';
-      const buyOrSellAmountString:number = response.data.latestBuySellEvent.buyQuantity? 
-        Number(response.data.latestBuySellEvent.buyQuantity) : 
-        Number(response.data.latestBuySellEvent.sellQuantity);
-      const buyOrSellEventDate:string = new Date(response.data.latestBuySellDate).toLocaleString();
-      const successMessage = `${buyOrSellString} of ${buyOrSellAmountString} ${this.selectedRowCoinName} has been successfully made on ${buyOrSellEventDate}`
+      // Retrieve the data of the add new coin event and set the message for it
+      const newCoinName:string = response.data.latestCoin.coinName;
+      const addNewCoinEventDate:string = new Date(response.data.latestCoinAddedDate).toLocaleString();
+      const successMessage = `${newCoinName} has been successfully added to portfolio on ${addNewCoinEventDate}!`
       // Get the updated coin data (to get the newly added coin) from the store then proceed with other following functions
       await this.getPortfolioCoinTableData();
       // Close add new coin modal

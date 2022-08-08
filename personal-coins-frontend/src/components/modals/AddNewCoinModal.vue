@@ -8,7 +8,10 @@
       <div class="modal-title">
         Add New Coin
       </div>
-      <div class="add-new-coin-dropdown">
+      <div 
+        class="add-new-coin-dropdown"
+        v-if="selectedCoinOptionName"
+      >
         <b-field label="Coin Name">
           <b-select
            v-model="selectedCoinOptionName"
@@ -23,6 +26,12 @@
             </option>
           </b-select>
         </b-field>
+      </div>
+      <div 
+        class="no-new-coins-available-notification"
+        v-if="!selectedCoinOptionName"
+      >
+        No New Coins Available for Purchase
       </div>
       <CoinDetailsModalComponent
         @retrievePartialCoinModalDetails="updateMainCoinModal"
@@ -48,12 +57,15 @@
 </template>
 
 <script lang="ts">
-import {Vue, Prop, Component} from 'vue-property-decorator'
+import {Vue, Prop, Component, Watch} from 'vue-property-decorator'
 import { BuySellCreateCoinRequestBody } from '../../models/api-related-model';
 import { CoinModalFieldData } from '../../models/form-data.model';
+import CoinDetailsModalComponent from './modal-subcomponent/CoinDetailsModalComponent.vue';
 
 @Component({
-  components:{}
+  components:{
+    CoinDetailsModalComponent
+  }
 })
 
 export default class AddNewCoinModal extends Vue {
@@ -78,30 +90,53 @@ export default class AddNewCoinModal extends Vue {
     {coinName:'Cardano',coinCode:'ADA'},
     {coinName:'Solana',coinCode:'SOL'},
   ]
-  availableCoinOptionsList = [];
+  availableCoinOptionsList: Partial<BuySellCreateCoinRequestBody>[] = [];
   selectedCoinOptionName = '';
   selectedCoinOption:Partial<BuySellCreateCoinRequestBody> | null = null;
   coinOptionDropdownDisabled = false;
   submitAddCoinButtonStatusIsDisabled = true;
   mainCoinModalDetails:CoinModalFieldData | null = null;
 
+  // Whenever the modal is closed or opened, set:
+  // 1. mainCoinModalDetails to null
+  // 2. selectedBuyOrSellOption to be 'buy' option
+  // 3. set the buySellButtonStatusIsDisabled to true
+  // Important as to ensure the data within this modal is reset to this default setting
+  @Watch('isActive')
+  coinModalDetailsToNullMethod(){
+    console.log('reverting mainCoinModalDetails to null...');
+    this.mainCoinModalDetails = null;
+    this.submitAddCoinButtonStatusIsDisabled = true;
+    console.log(`mainCoinModalDetails: ${JSON.stringify(this.mainCoinModalDetails)}`)
+    console.log(`submitAddCoinButtonStatusIsDisabled: ${this.submitAddCoinButtonStatusIsDisabled}`)
+  }
 
   // Set the availableCoinOptionsList to contain the coins that are not bought yet (will set the options in the modal)
-  mounted(){
+  @Watch('listOfExistingCoins')
+  updateAvailableCoinOptionsList(){
+    // Ensure that the availableCoinOptionsList is always an empty array on each call of the function
+    // to avoid any accidental duplicate elements in list and to refresh the list
+    this.availableCoinOptionsList = [];
     for(const option of this.coinOptionsList){
       if(!this.listOfExistingCoins.includes(option.coinName)){
         this.availableCoinOptionsList.push(option);
         this.selectedCoinOptionName = this.availableCoinOptionsList[0].coinName;
+        this.coinOptionDropdownDisabled = false;
+        console.log(`availableCoinOptionsList: ${JSON.stringify(this.availableCoinOptionsList)}`)
       }
-      // If all coin options have been bought, then set the option dropdown to be disabled
+      // If all coin options have been bought, then set the option dropdown to be disabled and empty
       // This should in turn disable the add new coin ability since no new coin can be added
       if(
         this.listOfExistingCoins.includes(option.coinName) && 
-        this.coinOptionsList.indexOf(option) === this.coinOptionsList.length - 1
+        this.availableCoinOptionsList.length === 0
       ){
+        console.log(`availableCoinOptionsList: ${JSON.stringify(this.availableCoinOptionsList)}`)
+        this.selectedCoinOptionName = '';
         this.coinOptionDropdownDisabled = true;
       }
     }
+    console.log(JSON.stringify(this.listOfExistingCoins))
+    console.log(JSON.stringify(this.availableCoinOptionsList))
   }
 
   closeModalFunction(){
@@ -118,7 +153,7 @@ export default class AddNewCoinModal extends Vue {
     this.mainCoinModalDetails = {...partialCoinModalDetails}
     this.submitAddCoinButtonStatusIsDisabled = isDisabled;
     if(this.coinOptionDropdownDisabled){
-      this.submitAddCoinButtonStatusIsDisabled = false
+      this.submitAddCoinButtonStatusIsDisabled = true;
     }
     console.log(`mainCoinModalDetails from AddNewCoinModal: ${JSON.stringify(this.mainCoinModalDetails)}`)
   }
