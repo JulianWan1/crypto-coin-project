@@ -24,6 +24,7 @@
         :isActive="isUpdateCoinEventModalActive"
         :coinEventDetails="selectedEventRow"
         :coinName="coinName"
+        :loadingStatus="loadingStatus"
         @closeModal="changeModalStatusAndDeselectRow"
         @triggerUpdate="updateCoinEvent"
       />
@@ -35,6 +36,8 @@
       <UpdateCoinEventConfirmationModal
         :isActive="isUpdateCoinEventConfirmationModalActive"
         :updateMessage="updateConfirmationMessage"
+        :eventId="confirmationEventId"
+        :loadingStatus="loadingStatus"
         @closeConfirmationModal="closeUpdateConfirmationModalAndOpenUpdateModal"
         @triggerUpdateConfirmation="confirmUpdateCoinEvent"
       />
@@ -88,11 +91,20 @@
       <option value="20">20 per page</option>
     </b-select>
     <b-button
-    v-if="successToast"
-    label="Close Update Message"
-    type="is-danger"
-    @click="closeToast"
+      v-if="successToast"
+      label="Close Update Message"
+      type="is-danger"
+      @click="closeToast"
     />
+    <div
+      class="loading-screen"
+      @click.stop
+    >
+      <b-loading
+        v-model="loadingStatus" 
+      >
+      </b-loading>
+    </div>
   </div>
 </template>
 
@@ -108,7 +120,7 @@ import { CoinModalFieldData } from '../models/form-data.model';
 import { CoinEventUpdateRequestBody, CoinEventUpdateRequestBodyRelevantFields, UpdateModalFields } from '../models/api-related-model';
 import { EventType } from '../enums/enums'
 import { BNoticeComponent } from 'buefy/types/components';
-import { updateFailedToast, updateSuccessToast } from '../utils/toasts'
+import { failedToastMethod, successToastMethod } from '../utils/toasts'
 import { convertFromCamelCaseToStartingUpperCaseWord } from '../utils/validation'
 
 @Component({
@@ -134,10 +146,11 @@ export default class CoinEventLogTableComponent extends Vue {
   perPage = 5;
   isUpdateCoinEventModalActive = false;
   isUpdateCoinEventConfirmationModalActive = false;
+  loadingStatus = false;
   requestBody: CoinEventUpdateRequestBody | null = null;
   proceedUpdateEvent: boolean|null = null;
   successToast: null | BNoticeComponent = null;
-  failureToast: null | BNoticeComponent = null;
+  confirmationEventId = 0;
   updateConfirmationMessage = ``;
 
   mounted() {
@@ -147,6 +160,7 @@ export default class CoinEventLogTableComponent extends Vue {
 
   // Get all of the events for the table
   async getCoinEventLogTableData(){
+    this.loadingStatus = true;
     await this.store.getCoinEvent(this.coinName);
     if(
       this.store && 
@@ -177,7 +191,8 @@ export default class CoinEventLogTableComponent extends Vue {
     }
     // Get the amount of data to be set in the table for pagination
     // e.g. 5 rows per page, hence take the first 5 from all of the required events list
-    this.loadPaginatedData();
+    await this.loadPaginatedData();
+    this.loadingStatus = false;
   }
 
   selectedRowStatusMethod(){
@@ -310,11 +325,13 @@ export default class CoinEventLogTableComponent extends Vue {
     }
     // Check if buySellEventAfterUpdateRelevantFields is empty (Meaning no updates were made by user)
     // If empty, don't close modal, and return error toast
-    // Otherwise, open confirmUpdateDialog
+    // Otherwise, open confirm update modal should open
+    // set the confirmationEventId & confirmationMessage that will be passed to the confirm update modal
     if(Object.keys(buySellEventAfterUpdateRelevantFields).length === 0){
       const noUpdatesFoundMessage = 'No Updates Found, Please Update At Least ONE Field'
-      updateFailedToast(noUpdatesFoundMessage);
+      failedToastMethod(noUpdatesFoundMessage);
     }else{
+      this.confirmationEventId = id; 
       let confirmationMessageList: string[] = [];
       for(const key in buySellEventAfterUpdateRelevantFields){
         if(buySellEventBeforeUpdateRelevantFields[key]){
@@ -340,6 +357,8 @@ export default class CoinEventLogTableComponent extends Vue {
   // If user proceeds with the update event confirmation (may have error or will be successful)
   // then call the update API from the store and wait for the response
   async confirmUpdateCoinEvent(){
+    // Start loading page
+    this.loadingStatus = true;
     // Convert the requestBody's editable numerical field values to numbers (anything other than id, coinName, eventType & eventDate)
     let ignoredKeys = ['id', 'coinName', 'eventType', 'eventDate'];
     let convertedRequestBody: CoinEventUpdateRequestBody = this.requestBody as CoinEventUpdateRequestBody;
@@ -355,6 +374,8 @@ export default class CoinEventLogTableComponent extends Vue {
     let response = await this.store.updateSpecificCoinEvent(convertedRequestBody)
     // Check if the update was successful or not
     await this.updateSuccessOrFailure(response, convertedRequestBody)
+    // Stop loading page
+    this.loadingStatus = false;
     // Clear the updateConfirmationMessage back to empty string
     this.updateConfirmationMessage = ``;
     console.log(`cleared updateConfirmationMessage post update: ${this.updateConfirmationMessage}`)
@@ -417,15 +438,14 @@ export default class CoinEventLogTableComponent extends Vue {
       // Close update confirmation modal
       this.changeConfirmationModalStatus();
       // Pop up the success toast (indefinite)
-      this.successToast = updateSuccessToast(this.successToast, successMessage)
+      this.successToast = successToastMethod(this.successToast, successMessage)
     }else{
       console.log(response);
       const errorMessage = response.message 
-      // TODO: Toast with fail message
       // Close update confirmation modal and reopen the update modal
       this.closeUpdateConfirmationModalAndOpenUpdateModal();
       // Pop up the failure toast 
-      updateFailedToast(errorMessage);
+      failedToastMethod(errorMessage);
     }
   }
 

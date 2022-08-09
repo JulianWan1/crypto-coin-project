@@ -32,3 +32,18 @@ export interface CoinEventUpdateRequestBodyRelevantFields {
 export interface UpdateModalFields {
 	[key:string]: number|Date 
 }
+
+export interface BuySellCreateCoinRequestBody {
+	coinName: string;
+	coinCode: string;
+	buySellQuantity: number;
+	marketPrice: number;
+	networkFee: number;
+	exchangePremium: number;
+	buySellDate: Date;
+}
+
+export interface MakeBuySellCoinRequestParameter {
+	requestBody: BuySellCreateCoinRequestBody; 
+	selectedBuyOrSellOption: string;
+}

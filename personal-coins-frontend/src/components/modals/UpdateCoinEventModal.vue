@@ -1,7 +1,7 @@
 <template> 
   <b-modal 
     :active="isActive"
-    :can-cancel="['escape', 'outside']"
+    :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeModalFunction"
   >
     <div
@@ -15,25 +15,26 @@
       </div>
       <div class="coin-details">
         <CoinDetailsModalComponent
-          :coinEventDetails="mainCoinModalDetails"
           :updateEventModalType="true"
+          :coinEventDetails="mainCoinModalDetails"
           :eventDateFromSelectedEvent="eventDateFromSelectedEvent"
           @retrievePartialCoinModalDetails="updateMainCoinModal"
         />
       </div>
       <div class="modal-buttons">
         <button 
-          class="update-button"
-          :disabled="updateButtonStatusIsDisabled"
-          @click="convertAndSubmitData"
-        >
-          Update
-        </button>
-        <button 
           class="cancel-button"
-          @click="closeModalFunction"  
+          :disabled="loadingStatus"
+          @click="closeModalFunction"
         >
           Cancel
+        </button>
+        <button 
+          class="update-button"
+          :disabled="updateButtonStatusIsDisabled"
+          @click="submitDataToCoinEventLogTableComponent"
+        >
+          Update
         </button>
       </div>
     </div>
@@ -63,6 +64,9 @@ export default class UpdateCoinEventModal extends Vue {
   @Prop()
   coinName!: string;
 
+  @Prop({default:false})
+  loadingStatus!:boolean;
+
   mainCoinModalDetails:CoinModalFieldData | null = null;
 
   eventId: number | null = null;
@@ -72,6 +76,17 @@ export default class UpdateCoinEventModal extends Vue {
   eventDateFromSelectedEvent: Date | null = null;
 
   updateButtonStatusIsDisabled = false;
+
+  // Whenever loading page is triggered, ensure that update button is disabled
+  // When loading status is finished, set the update button to be active
+  @Watch('loadingStatus')
+  disableEnableSubmitButton(){
+    if(this.loadingStatus){
+      this.updateButtonStatusIsDisabled = true;
+    }else{
+      this.updateButtonStatusIsDisabled = false;
+    }
+  }
 
 // Set the modal data to be of the selected row from table
 // To be sent to the coinDetailsModalComponent as prop
@@ -116,25 +131,8 @@ export default class UpdateCoinEventModal extends Vue {
     console.log(`mainCoinModalDetails from updateCoinEventModal: ${JSON.stringify(this.mainCoinModalDetails)}`)
   }
 
-// Convert all numerical fields to number type
-  convertAndSubmitData(){
-    // const ignoredKeys = ['dateTime', 'coinType', 'buySellEvent'];
-    // let newData: CoinModalFieldData = this.mainCoinModalDetails as CoinModalFieldData;
-
-    // for (const [key, value] of Object.entries(
-    //   this.mainCoinModalDetails as CoinModalFieldData,
-    // )) {
-    //   if (!ignoredKeys.includes(key)) {
-    //     newData = {
-    //       ...newData,
-    //       [key]: Number(value),
-    //     };
-    //   }
-    // }
-    // this.mainCoinModalDetails = {
-    //   ...this.mainCoinModalDetails,
-    //   ...newData,
-    // };
+  // Send data to the CoinEventLogTableComponent
+  submitDataToCoinEventLogTableComponent(){
     console.log(`Submitted Data to CoinEventLogTable: ${JSON.stringify(this.mainCoinModalDetails)}`)
     this.$emit('triggerUpdate', this.mainCoinModalDetails)
   }

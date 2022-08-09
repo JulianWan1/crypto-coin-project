@@ -1,12 +1,12 @@
 <template>
   <b-modal
     :active="isActive"
-    :can-cancel="['escape', 'outside']"
+    :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeConfirmationModal"
   >
     <div class="update-coin-event-confirmation-modal-container">
       <div class="update-confirmation-title">
-        Confirm Update(s) for {eventId}?
+        Confirm Update(s) for Event ID #{{eventId}}?
       </div>
       <div class="update-confirmation-message">
       {{updateMessage}}
@@ -14,12 +14,14 @@
       <div class="modal-buttons">
         <button 
           class="back-to-modal-button"
+          :disabled="loadingStatus"
           @click="closeConfirmationModal"
         >
           Back to Modal
         </button>
         <button 
           class="confirm-update-button"
+          :disabled="loadingStatus"
           @click="triggerUpdateConfirmation"
         >
           Confirm
@@ -30,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import {Emit, Prop, Vue, Component} from 'vue-property-decorator'
+import { Emit, Prop, Vue, Component } from 'vue-property-decorator'
 
 @Component({
 
@@ -44,13 +46,15 @@ export default class UpdateCoinEventConfirmationModal extends Vue {
   @Prop()
   updateMessage!: string;
 
-  // @Prop()
-  // eventId:number;
+  @Prop()
+  eventId!: number;
+
+  @Prop({default:false})
+  loadingStatus!:boolean;
 
   triggerUpdateConfirmation(){
     this.$emit('triggerUpdateConfirmation');
   }
-
 
   @Emit('closeConfirmationModal')
     closeConfirmationModal(){
