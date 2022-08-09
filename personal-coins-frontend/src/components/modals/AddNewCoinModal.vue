@@ -99,8 +99,7 @@ export default class AddNewCoinModal extends Vue {
 
   // Whenever the modal is closed or opened, set:
   // 1. mainCoinModalDetails to null
-  // 2. selectedBuyOrSellOption to be 'buy' option
-  // 3. set the buySellButtonStatusIsDisabled to true
+  // 2. set the submitAddCoinButtonStatusIsDisabled to true
   // Important as to ensure the data within this modal is reset to this default setting
   @Watch('isActive')
   coinModalDetailsToNullMethod(){
@@ -109,6 +108,17 @@ export default class AddNewCoinModal extends Vue {
     this.submitAddCoinButtonStatusIsDisabled = true;
     console.log(`mainCoinModalDetails: ${JSON.stringify(this.mainCoinModalDetails)}`)
     console.log(`submitAddCoinButtonStatusIsDisabled: ${this.submitAddCoinButtonStatusIsDisabled}`)
+  }
+
+  // Whenever loading page is triggered, ensure that add coin button is disabled
+  // When loading status is finished, set the add coin button to be active
+  @Watch('loadingStatus')
+  disableEnableSubmitButton(){
+    if(this.loadingStatus){
+      this.submitAddCoinButtonStatusIsDisabled = true;
+    }else{
+      this.submitAddCoinButtonStatusIsDisabled = false;
+    }
   }
 
   // Set the availableCoinOptionsList to contain the coins that are not bought yet (will set the options in the modal)
