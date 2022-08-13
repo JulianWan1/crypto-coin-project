@@ -1,4 +1,4 @@
-import { CoinEvent } from "@/models/table.model";
+import { CoinEvent, CoinEventLog } from "@/models/table.model";
 import {
   Module,
   Mutation,
@@ -70,6 +70,30 @@ export class CoinEventLogStore extends VuexModule {
     }
   }
   
+  @Action
+  async deleteSpecificCoinEvent(selectedEventRowDetails:CoinEvent):Promise<any>{
+    if (this.isLoading) {
+      console.log(this.isLoading)
+      return
+    }
+    await this.context.commit('mutateLoadingStatus', true);
+    const {id} = selectedEventRowDetails.coinEventLog[0];
+    const {coinName} = selectedEventRowDetails;
+    try {
+      const response = await axios.delete(`${Endpoints.DeleteCoinOrCoinEvent}/${coinName}/${id}`)
+      this.context.commit('mutateLoadingStatus', false);
+      return response;
+    }catch(error:any){
+      if(error){
+        this.context.commit('mutateLoadingStatus', false);
+        return error.response.data
+      }else {
+        console.log("deletion of event took too long, potential timeout");
+        this.context.commit('mutateLoadingStatus', false);
+      }
+    }
+  }
+
 }
 
 export default getModule(CoinEventLogStore);

@@ -85,7 +85,29 @@ export class CoinListStore extends VuexModule {
       if(error){
         return error.response.data
       }else {
-        console.log("data submission took too long, potential timeout")
+        console.log("data submission took too long, potential timeout");
+      }
+    }
+  }
+
+  @Action
+  async makeDeleteCoinRequest(coinName:string): Promise<any> {
+    if(this.isLoading){
+      console.log(`deleteCoinRequest is Loading: ${this.isLoading}`)
+      return;
+    }
+    await this.context.commit('mutateLoadingStatus', true);
+    console.log(`successfully mutateLoadingStatus: ${this.isLoading} `)
+
+    const coinNameToLowerCase = coinName.toLowerCase();
+    try{
+      const response = await axios.delete(`${Endpoints.DeleteCoinOrCoinEvent}/${coinNameToLowerCase}`);
+      return response;
+    }catch(error:any){
+      if(error){
+        return error.response.data
+      }else{
+        console.log("deletion took too long, potential timeout");
       }
     }
   }

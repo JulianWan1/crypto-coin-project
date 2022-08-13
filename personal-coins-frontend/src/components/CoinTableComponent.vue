@@ -27,7 +27,9 @@
         >
           View Log
         </b-button>
-        <b-button>
+        <b-button
+        @click="changeDeleteCoinModalStatus"
+        >
           Delete
         </b-button>
       </div>
@@ -38,9 +40,9 @@
     >
       <BuySellCoinModal
         :isActive="isBuySellModalActive"
+        :loadingStatus="loadingStatus"
         :coinName="selectedRowCoinName"
         :coinCode="selectedRowCoinCode"
-        :loadingStatus="loadingStatus"
         @closeModal="changeBuySellModalStatusAndDeselectRow"
         @triggerBuySellCoinEvent="submitBuySellCoinEvent"
       />
@@ -51,10 +53,22 @@
     >
       <AddNewCoinModal
         :isActive="isAddNewCoinModalActive"
-        :listOfExistingCoins="coinsAlreadyBought"
         :loadingStatus="loadingStatus"
+        :listOfExistingCoins="coinsAlreadyBought"
         @closeModal="changeAddNewCoinModalStatus"
         @triggerAddNewCoinEvent="submitAddNewCoinEvent"
+      />
+    </div>
+    <div
+      class="delete-coin-modal"
+      @click.stop
+    >
+      <DeleteCoinModal
+        :isActive="isDeleteCoinModalActive"
+        :loadingStatus="loadingStatus"
+        :coinName="selectedRowCoinName"        
+        @closeModal="changeDeleteCoinModalStatusAndDeselectRow"
+        @triggerDeleteCoinEvent="submitCoinDeletionEvent"
       />
     </div>
     <b-table
@@ -193,6 +207,7 @@ import { LiveCoinWatchFunctions } from "../general-fe-functions/live-coin-watch-
 import { BuySellCreateCoinRequestBody, MakeBuySellCoinRequestParameter, UnrealisedProfitLossPercentageCalculatorResponse } from "../models/api-related-model"
 import BuySellCoinModal from '../components/modals/BuySellCoinModal.vue';
 import AddNewCoinModal from '../components/modals/AddNewCoinModal.vue';
+import DeleteCoinModal  from "./modals/DeleteCoinModal.vue";
 import { mixin as clickaway } from "vue-clickaway";
 import { CoinModalFieldData } from "../models/form-data.model";
 import { failedToastMethod, successToastMethod } from "../utils/toasts";
@@ -201,7 +216,8 @@ import { BNoticeComponent } from "buefy/types/components";
 @Component({
   components: {
     AddNewCoinModal,
-    BuySellCoinModal
+    BuySellCoinModal,
+    DeleteCoinModal
   },
   mixins: [ clickaway ] // set the v-on-clickaway functionality for the table's row (allow row to be deselected when clicking outside the table). Refer to vue clickaway library for more details
 })
@@ -217,6 +233,7 @@ export default class CoinTableComponent extends Vue {
   liveCoinWatchFunctions = new LiveCoinWatchFunctions;
   isBuySellModalActive = false;
   isAddNewCoinModalActive = false;
+  isDeleteCoinModalActive = false;
   coinsAlreadyBought:string[] = [];
   loadingStatus = false;
   successToast: null | BNoticeComponent = null;
@@ -305,23 +322,23 @@ export default class CoinTableComponent extends Vue {
     }
   }
 
-  // 1. Mainly functions for buy/sell Modal
+  // 1. Functions for buy/sell Modal
 
-  // Close buy sell modal 
+  // 1.1 Close buy sell modal 
   // Set the isLoading state from true to false
   changeBuySellModalStatus(){
-    this.isBuySellModalActive = !this.isBuySellModalActive
+    this.isBuySellModalActive = !this.isBuySellModalActive;
     this.store.setIsLoadingToFalse();
   }
 
-  // Close the buy sell modal
+  // 1.2 Close the buy sell modal
   // and deselect selected coin row
   changeBuySellModalStatusAndDeselectRow(){
     this.changeBuySellModalStatus();
     this.deselectRowMethod();
   }
 
-  // To make the submission of buy/sell coin event to API in store after making the buy/sell from modal
+  // 1.3 To make the submission of buy/sell coin event to API in store after making the buy/sell from modal
   async submitBuySellCoinEvent(mainCoinModalDetails:CoinModalFieldData, selectedBuyOrSellOption:string){
     // Open loading screen
     this.loadingStatus = true;
@@ -360,6 +377,7 @@ export default class CoinTableComponent extends Vue {
     }
   }
 
+  // 1.4 Check Buy/Sell Submission Response
   async buySellCoinSuccessOrFailure(response:any){
     // If update is successful (status 200) (which returns success response), toast, get the updated data from store, update the selectedEventRow and close modal
     // If update fails (status 400, 403, 500), return toast with error and keep modal open with error msg
@@ -392,16 +410,16 @@ export default class CoinTableComponent extends Vue {
     }
   }
 
-  // 2. Mainly functions for Add New Coin Button
+  // 2. Functions for Add New Coin Modal
 
-  // Close Add New Coin Modal 
+  // 2.1 Close Add New Coin Modal 
   // Set the isLoading state from true to false
   changeAddNewCoinModalStatus(){
-    this.isAddNewCoinModalActive = !this.isAddNewCoinModalActive
+    this.isAddNewCoinModalActive = !this.isAddNewCoinModalActive;
     this.store.setIsLoadingToFalse();
   }
 
-  // 1. Submit New Coin Addition
+  // 2.2 Submit New Coin Addition
     async submitAddNewCoinEvent(mainCoinModalDetails:CoinModalFieldData, selectedCoinOption:Partial<BuySellCreateCoinRequestBody>){
     // Open loading screen
     this.loadingStatus = true;
@@ -434,7 +452,7 @@ export default class CoinTableComponent extends Vue {
     }
   }
 
-  // 2. Check New Coin Addition Submission Response
+  // 2.3 Check New Coin Addition Submission Response
   async addNewCoinSuccessOrFailure(response:any){
     // If submission is successful (status 201) (which returns success response), toast, 
     // If submission fails (status 400, 403, 500), return toast with error and keep modal open with error msg
@@ -448,6 +466,60 @@ export default class CoinTableComponent extends Vue {
       await this.getPortfolioCoinTableData();
       // Close add new coin modal
       this.changeAddNewCoinModalStatus();
+      // Close loading screen
+      this.loadingStatus = false;
+      // Pop up the success toast (indefinite)
+      this.successToast = successToastMethod(this.successToast, successMessage)
+    }else{
+      console.log(response);
+      // Close loading screen
+      this.loadingStatus = false;
+      const errorMessage = response.message 
+      // Pop up the failure toast 
+      failedToastMethod(errorMessage);
+    }
+  }
+
+  // 3. Functions for Delete Coin Modal
+
+    // 3.1 Close delete coin modal 
+  // Set the isLoading state from true to false
+  changeDeleteCoinModalStatus(){
+    this.isDeleteCoinModalActive = !this.isDeleteCoinModalActive;
+    this.store.setIsLoadingToFalse();
+  }
+
+  // 3.2 Close the delete coin modal
+  // and deselect selected coin row
+  changeDeleteCoinModalStatusAndDeselectRow(){
+    this.changeDeleteCoinModalStatus();
+    this.deselectRowMethod();
+  }
+
+  // 3.3 Submit Coin Deletion through Store 
+  async submitCoinDeletionEvent(){
+    // Only need to use the selectedRow's coinName (in lowercase)
+    this.loadingStatus = true;
+    console.log(`submitBuySellCoinEvent's coinName ${this.selectedRowCoinName}`);
+
+    const deleteCoinResponse = await this.store.makeDeleteCoinRequest(this.selectedRowCoinName);
+
+    // Check if response is not undefined & returns success or failure
+    if(deleteCoinResponse){
+      await this.deleteCoinResponseSuccessOrFailure(deleteCoinResponse);
+    }
+  }
+  // 3.4 Check Coin Deletion Response
+  async deleteCoinResponseSuccessOrFailure(response:any){
+    if(response && response.status === 200){
+      console.log(response);
+      const successMessage = `${this.selectedRowCoinName} has been deleted from portfolio`
+      // Get the updated coin data from the store then proceed with other following functions
+      await this.getPortfolioCoinTableData();
+      // Deselect the coin row
+      this.deselectRowMethod();
+      // Close buy/sell coin modal
+      this.changeDeleteCoinModalStatus();
       // Close loading screen
       this.loadingStatus = false;
       // Pop up the success toast (indefinite)
