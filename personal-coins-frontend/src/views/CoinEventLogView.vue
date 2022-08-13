@@ -1,12 +1,6 @@
 <template>
   <div class="home">
     <h1>{{coinNameRetrieved.toUpperCase()}} EVENT LOGS</h1>
-    <b-button
-      tag="router-link"
-      :to="{ name: 'PortfolioView' }"
-    >
-      Back to Portfolio
-    </b-button>
     <CoinEventLogTableComponent
     :coinName="coinNameRetrieved"
     />

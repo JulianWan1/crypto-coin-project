@@ -7,12 +7,26 @@
         @click.stop
       >
         <b-button
-          @click="changeModalStatus"
+          @click="changeUpdateCoinEventModalStatus"
         >
           Update
         </b-button>
-        <b-button>
+        <b-button
+          @click="changeDeleteCoinEventModalStatus"
+        >
           Delete
+        </b-button>
+      </div>
+      <div
+        class="back-to-portfolio-button"
+        @click.stop
+        @click="closeToast"
+      >
+        <b-button
+          tag="router-link"
+          :to="{ name: 'PortfolioView' }"
+        >
+          Back to Portfolio
         </b-button>
       </div>
     </div>
@@ -25,7 +39,7 @@
         :coinEventDetails="selectedEventRow"
         :coinName="coinName"
         :loadingStatus="loadingStatus"
-        @closeModal="changeModalStatusAndDeselectRow"
+        @closeModal="changeUpdateCoinEventModalStatusAndDeselectRow"
         @triggerUpdate="updateCoinEvent"
       />
     </div>
@@ -40,6 +54,19 @@
         :loadingStatus="loadingStatus"
         @closeConfirmationModal="closeUpdateConfirmationModalAndOpenUpdateModal"
         @triggerUpdateConfirmation="confirmUpdateCoinEvent"
+      />
+    </div>
+    <div
+      class="delete-coin-event-modal"
+      @click.stop
+    >
+      <DeleteCoinEventModal
+        :isActive="isDeleteCoinEventModalActive"
+        :coinEventDetails="selectedEventRow"
+        :coinName="coinName"
+        :loadingStatus="loadingStatus"
+        @closeModal="changeDeleteCoinEventModalStatusAndDeselectRow"
+        @triggerDelete="deleteCoinEvent"
       />
     </div>
     <b-table
@@ -95,6 +122,7 @@
       label="Close Update Message"
       type="is-danger"
       @click="closeToast"
+      v-on-clickaway="closeToast"
     />
     <div
       class="loading-screen"
@@ -110,12 +138,13 @@
 
 <script lang="ts">
 import {Vue, Component, Watch, Prop} from 'vue-property-decorator'
-import { CoinEventLog } from '../models/table.model';
+import { CoinEvent, CoinEventLog } from '../models/table.model';
 import { CoinEventLogStore } from '../store/coin-store/coin.event.log';
 import { coinStore } from '../store/coin-store/coin.store.index';
 import { mixin as clickaway } from "vue-clickaway";
 import UpdateCoinEventModal from './modals/UpdateCoinEventModal.vue';
 import UpdateCoinEventConfirmationModal from './modals/UpdateCoinEventConfirmationModal.vue'
+import DeleteCoinEventModal from './modals/DeleteCoinEventModal.vue';
 import { CoinModalFieldData } from '../models/form-data.model';
 import { CoinEventUpdateRequestBody, CoinEventUpdateRequestBodyRelevantFields, UpdateModalFields } from '../models/api-related-model';
 import { EventType } from '../enums/enums'
@@ -126,7 +155,8 @@ import { convertFromCamelCaseToStartingUpperCaseWord } from '../utils/validation
 @Component({
   components: {
     UpdateCoinEventModal,
-    UpdateCoinEventConfirmationModal
+    UpdateCoinEventConfirmationModal,
+    DeleteCoinEventModal
   },
   mixins: [ clickaway ]
 })
@@ -146,6 +176,7 @@ export default class CoinEventLogTableComponent extends Vue {
   perPage = 5;
   isUpdateCoinEventModalActive = false;
   isUpdateCoinEventConfirmationModalActive = false;
+  isDeleteCoinEventModalActive = false;
   loadingStatus = false;
   requestBody: CoinEventUpdateRequestBody | null = null;
   proceedUpdateEvent: boolean|null = null;
@@ -158,7 +189,7 @@ export default class CoinEventLogTableComponent extends Vue {
     this.selectedEventRow = null;
   }
 
-  // Get all of the events for the table
+  // 1. Get all of the events for the table
   async getCoinEventLogTableData(){
     this.loadingStatus = true;
     await this.store.getCoinEvent(this.coinName);
@@ -195,15 +226,6 @@ export default class CoinEventLogTableComponent extends Vue {
     this.loadingStatus = false;
   }
 
-  selectedRowStatusMethod(){
-    this.selectedEventRow = null
-  }
-
-  @Watch('selectedEventRow')
-  logSelectedStatus(){
-    console.log(`Selected/Updated Event for ${this.coinName}: ${JSON.stringify(this.selectedEventRow)}`);
-  }
-
   // Function whenever the current page is changed for the table
   onPageChange(currentPage:number){
     this.currentPage = currentPage;
@@ -223,28 +245,34 @@ export default class CoinEventLogTableComponent extends Vue {
     this.loadPaginatedData();
   }
 
-  // Open and close the modal
-  changeModalStatus(){
+  selectedRowStatusMethod(){
+    this.selectedEventRow = null
+  }
+
+  @Watch('selectedEventRow')
+  logSelectedStatus(){
+    console.log(`Selected/Updated Event for ${this.coinName}: ${JSON.stringify(this.selectedEventRow)}`);
+  }
+
+  // 2. Functionalities for Update Coin Event & its Confirmation Modal 
+
+  // 2.1 Open and close the modal
+  changeUpdateCoinEventModalStatus(){
     this.isUpdateCoinEventModalActive = !this.isUpdateCoinEventModalActive;
   }
 
-  // Close modal and deselect the selected row earlier
-  changeModalStatusAndDeselectRow(){
-    this.changeModalStatus()
-    this.deselectRow()
+  // 2.2 Close modal and deselect the selected row earlier
+  changeUpdateCoinEventModalStatusAndDeselectRow(){
+    this.changeUpdateCoinEventModalStatus()
+    this.selectedRowStatusMethod()
   }
 
-  // Deselect the selected row for update
-  deselectRow(){
-    this.selectedRowStatusMethod();
-  }
-
-  // Open and close the update confirmation modal
+  // 2.3 Open and close the update confirmation modal
   changeConfirmationModalStatus(){
     this.isUpdateCoinEventConfirmationModalActive = !this.isUpdateCoinEventConfirmationModalActive;
   }
 
-  // Close the update confirmation modal 
+  // 2.4 Close the update confirmation modal 
   // Reopen the update modal 
   // Clear the updateConfirmationMessage back to empty string
   closeUpdateConfirmationModalAndOpenUpdateModal(){
@@ -253,6 +281,7 @@ export default class CoinEventLogTableComponent extends Vue {
     this.updateConfirmationMessage = ``;
   }
 
+  // 2.5 Setting up the request body for update and to reroute to confirmation modal
   async updateCoinEvent(mainCoinModalDetails:CoinModalFieldData){
     // Get all the required data for the requestBody
     // First get all data from the current selected row
@@ -346,7 +375,7 @@ export default class CoinEventLogTableComponent extends Vue {
       }
       console.log(`Confirmation Message: ${this.updateConfirmationMessage}`)
       // Close the modal
-      this.changeModalStatus();
+      this.changeUpdateCoinEventModalStatus();
       console.log(`isUpdateCoinEventModalActive: ${this.isUpdateCoinEventModalActive}`);
       // Open Confirm Update Modal
       this.changeConfirmationModalStatus();
@@ -354,7 +383,7 @@ export default class CoinEventLogTableComponent extends Vue {
     }
   }
 
-  // If user proceeds with the update event confirmation (may have error or will be successful)
+  // 2.6 If user proceeds with the update event confirmation (may have error or will be successful)
   // then call the update API from the store and wait for the response
   async confirmUpdateCoinEvent(){
     // Start loading page
@@ -381,6 +410,7 @@ export default class CoinEventLogTableComponent extends Vue {
     console.log(`cleared updateConfirmationMessage post update: ${this.updateConfirmationMessage}`)
   }
 
+  // 2.7 Retrieve Update Success or Failure Response
   async updateSuccessOrFailure(response:any, requestBody:CoinEventUpdateRequestBody){
     // If update is successful (status 200) (which returns success response), toast, get the updated data from store, update the selectedEventRow and close modal
     // If update fails (status 400, 403, 500), return toast with error and keep modal open with error msg
@@ -421,7 +451,6 @@ export default class CoinEventLogTableComponent extends Vue {
         After Update: \n\
         ${JSON.stringify(buySellEventAfterUpdateRelevantFields)}
       `
-
       // Get the updated data from the store then proceed with other following functions
       await this.getCoinEventLogTableData()
       // Update the selected event row based on id 
@@ -434,7 +463,7 @@ export default class CoinEventLogTableComponent extends Vue {
         }
       ) as CoinEventLog;
       // Deselect the event row
-      this.deselectRow();
+      this.selectedRowStatusMethod();
       // Close update confirmation modal
       this.changeConfirmationModalStatus();
       // Pop up the success toast (indefinite)
@@ -444,6 +473,54 @@ export default class CoinEventLogTableComponent extends Vue {
       const errorMessage = response.message 
       // Close update confirmation modal and reopen the update modal
       this.closeUpdateConfirmationModalAndOpenUpdateModal();
+      // Pop up the failure toast 
+      failedToastMethod(errorMessage);
+    }
+  }
+
+  // 3. Functionalities for Delete Coin Modal
+  
+  // 3.1 Open and close the modal
+  changeDeleteCoinEventModalStatus(){
+    this.isDeleteCoinEventModalActive = !this.isDeleteCoinEventModalActive;
+  }
+
+  // 3.2 Close modal and deselect the selected row earlier
+  changeDeleteCoinEventModalStatusAndDeselectRow(){
+    this.changeDeleteCoinEventModalStatus();
+    this.selectedRowStatusMethod();
+  }
+
+  // 3.3 Call to Store to Delete Coin Event
+  async deleteCoinEvent(){
+    this.loadingStatus = true;
+    // deleteSpecificCoinEvent can only take in one parameter, hence selectedEventRow and the coinName have to exist in one object
+    const selectedEventRowDetails: CoinEvent = {coinName: this.coinName, coinEventLog: [this.selectedEventRow!]}
+    const response = await this.store.deleteSpecificCoinEvent(selectedEventRowDetails);
+    await this.deleteResponseSuccessOrFailure(response);
+    // Stop loading page
+    this.loadingStatus = false;
+  }
+
+  // 3.4 Retreive Successful or Failed Delete Coin Event Response
+  async deleteResponseSuccessOrFailure(response:any){
+    if(response && response.status === 200){
+      console.log(response);
+      const {id, eventType, eventDate} = response.data.deletedEventsFromDB
+      const transformedEventDate:string =  new Date(eventDate).toLocaleString()
+      const successMessage = `${eventType === 2 ? 'Buy': 'Sell'} event #${id} on ${transformedEventDate} from ${this.coinName[0].toUpperCase()+this.coinName.slice(1)} has been successfully deleted`
+      // Get the updated data from the store then proceed with other following functions
+      await this.getCoinEventLogTableData()
+      // Deselect the event row
+      this.selectedRowStatusMethod();
+      // Close delete coin event modal
+      this.changeDeleteCoinEventModalStatus();
+      // Pop up the success toast (indefinite)
+      this.successToast = successToastMethod(this.successToast, successMessage)
+    }else{
+      const errorMessage = response.message 
+      // Close delete coin event modal
+      this.changeDeleteCoinEventModalStatus();
       // Pop up the failure toast 
       failedToastMethod(errorMessage);
     }

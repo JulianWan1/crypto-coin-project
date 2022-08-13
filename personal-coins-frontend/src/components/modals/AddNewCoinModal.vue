@@ -76,7 +76,7 @@ export default class AddNewCoinModal extends Vue {
   // Get the list of existing coins from the CoinTableComponent
   // to ensure that the dropdown will only show coins that are not bought
   @Prop()
-  listOfExistingCoins: string[];
+  listOfExistingCoins!: string[];
 
   @Prop({default:false})
   loadingStatus!:boolean;
@@ -128,16 +128,16 @@ export default class AddNewCoinModal extends Vue {
     // to avoid any accidental duplicate elements in list and to refresh the list
     this.availableCoinOptionsList = [];
     for(const option of this.coinOptionsList){
-      if(!this.listOfExistingCoins.includes(option.coinName)){
+      if(!this.listOfExistingCoins.includes(option.coinName!)){
         this.availableCoinOptionsList.push(option);
-        this.selectedCoinOptionName = this.availableCoinOptionsList[0].coinName;
+        this.selectedCoinOptionName = this.availableCoinOptionsList[0].coinName!;
         this.coinOptionDropdownDisabled = false;
         console.log(`availableCoinOptionsList: ${JSON.stringify(this.availableCoinOptionsList)}`)
       }
       // If all coin options have been bought, then set the option dropdown to be disabled and empty
       // This should in turn disable the add new coin ability since no new coin can be added
       if(
-        this.listOfExistingCoins.includes(option.coinName) && 
+        this.listOfExistingCoins.includes(option.coinName!) && 
         this.availableCoinOptionsList.length === 0
       ){
         console.log(`availableCoinOptionsList: ${JSON.stringify(this.availableCoinOptionsList)}`)
