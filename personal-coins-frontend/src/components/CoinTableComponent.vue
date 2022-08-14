@@ -101,7 +101,7 @@
         sortable
         v-slot="props"
       >
-        {{ props.row.currentAmountOwned }}
+        {{ props.row.currentAmountOwned.toFixed(6) }}
       </b-table-column>
       <b-table-column
         field="currentCoinMarketPrice"
@@ -139,7 +139,7 @@
         v-slot="props"
       >
         {{ 
-          props.row.unrealisedProfitLossPercentage? 
+          props.row.unrealisedProfitLossPercentage ? 
           parseFloat((props.row.unrealisedProfitLossPercentage * 100).toFixed(3)) : `N/A`
         }}
       </b-table-column>
@@ -277,6 +277,8 @@ export default class CoinTableComponent extends Vue {
   async currentCoinMarketPriceRetriever(portfolioCoinList:Coin[]){
     // Iterate through every coin in the list and set their respective currentCoinMarketPrice & unrealisedProfitLossPercentage
     // Also convert the lastBoughtDate & lastSoldDate from UTC to local time
+    // convert the CurrentAmountOwned values for each coin to be number type 
+    // (to ensure the default sorting of the current amount owned column will sort based on numerical value rather than on string basis)
     for(let i = 0; i < portfolioCoinList.length; i++){
       const marketPriceAndProfitLossPercentage: UnrealisedProfitLossPercentageCalculatorResponse = 
         await this.liveCoinWatchFunctions.unrealisedProfitLossPercentageCalculator(portfolioCoinList[i]);
@@ -284,8 +286,7 @@ export default class CoinTableComponent extends Vue {
       const {currentCoinMarketPrice, unrealisedProfitLossPercentage} = marketPriceAndProfitLossPercentage;
       if(
         marketPriceAndProfitLossPercentage &&
-        currentCoinMarketPrice &&
-        unrealisedProfitLossPercentage
+        currentCoinMarketPrice
       ){
         portfolioCoinList[i] = {
           ...portfolioCoinList[i], 
@@ -295,6 +296,7 @@ export default class CoinTableComponent extends Vue {
       }
       portfolioCoinList[i].lastBoughtDate = new Date(portfolioCoinList[i].lastBoughtDate);
       portfolioCoinList[i].lastSoldDate = portfolioCoinList[i].lastSoldDate !== null ? new Date(portfolioCoinList[i].lastSoldDate as Date) : null;
+      portfolioCoinList[i].currentAmountOwned = Number(portfolioCoinList[i].currentAmountOwned!);
     }
     // set the portfolioCoinList to be used by the table
     // BIG NOTE: 

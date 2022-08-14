@@ -37,9 +37,13 @@ export class LiveCoinWatchFunctions {
       const singleCoinData = await apiCall();
       console.log(JSON.parse(JSON.stringify(singleCoinData)));
       const currentCoinMarketPrice: number = singleCoinData.rate;
+      console.log(`currentDollarCostAverage: ${currentDollarCostAverage}`);
       const unrealisedProfitLossPercentage: number | null = 
-        currentDollarCostAverage ? 
-        (currentCoinMarketPrice - currentDollarCostAverage) / (currentDollarCostAverage) : 
+        // currentDollarCostAverage is read as a string variable type instead of number type, 
+        // hence will regard 0 as "0", and mistakenly pass the ternary operator condition, and cause Infinity to be returned
+        // if currentDollarCostAverage is 0
+        Number(currentDollarCostAverage) ? 
+        (currentCoinMarketPrice - currentDollarCostAverage!) / (currentDollarCostAverage!) : 
         null; 
       // Set the marketPriceAndProfitLossPercentage to be returned
       marketPriceAndProfitLossPercentage = {
