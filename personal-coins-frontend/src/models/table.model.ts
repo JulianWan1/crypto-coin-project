@@ -26,7 +26,7 @@ export interface Coin {
   dollarSoldAverage: number | null;
   totalBought: number | null;
   totalSold: number | null;
-  unrealisedProfitLossPercentage?: number;
+  unrealisedProfitLossPercentage?: number | null;
   realisedProfitLossPercentage: number | null;
   createdAt: Date;
   updatedAt: Date;
