@@ -1,0 +1,45 @@
+// 2. Table Variables
+// 2.1 Table Fonts
+$table-font-family-general: "Avenir";
+$table-font-weight-general: 500;
+$table-font-size-general: 15px;
+$table-font-size-title: 25px;
+$table-font-weight-title: 600;
+$table-font-size-sub-title: 20px;
+$table-font-weight-sub-title: 500;
+$table-font-weight-fields: 500;
+
+// 2.2 Table Colours & Opacities
+$table-mobile-card-background-colour: #1A2F4B;
+$table-background-colour: #28475C;
+$table-row-hover-colour: rgba(45, 116, 164, 0.8);
+$table-accent-colour: #2F8886;
+$table-accent-border-colour: #5db5b4;
+$table-accent-box-shadow-colour: 0 0 0 0.125em rgba(47, 136, 134, 0.25);
+
+$table-font-colour-general: white;
+
+$table-button-wording-colour-general: white;
+$table-button-wording-colour-disabled: rgba(255, 255, 255, 0.75);
+
+$table-button-opacity: 0.85;
+$table-button-opacity-focus-hover-active: 1.0;
+$table-button-opacity-disabled: 0.45;
+
+$table-button-colour-submit: #48c78e; 
+$table-button-border-colour-submit: #76efc7;
+$table-button-box-shadow-colour-submit: 0 0 0 0.125em rgba(55, 136, 109, 0.455);
+
+$table-button-colour-delete: #fa5252;
+$table-button-border-colour-delete: #f08d8d;
+$table-button-box-shadow-colour-delete: 0 0 0 0.125em rgba(213, 87, 87, 0.25);
+
+$table-pagination-background-colour: #2F8886;
+$table-pagination-border-colour-focused: #5db5b4;
+$table-pagination-border-colour: #2F8886;
+$table-pagination-is-current-background-colour: #28475C;
+$table-pagination-is-current-border-colour:#28475C;
+
+// 2.3 Mobile & Tablet Support
+$table-mobile-max-width: 625px;
+$table-tablet-max-width: 1023px;

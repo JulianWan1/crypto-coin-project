@@ -1,66 +1,102 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
-import { CoinsService } from './coins.service';
-import {
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
-import { Coin } from 'src/entities/coin.entity';
-import { CreateCoinDto } from 'src/dto/create-coin.dto';
-import { UpdateCoinDto } from 'src/dto/update-coin.dto';
+import { Body, Controller, Delete, Get, Logger, Param, Patch, Post } from '@nestjs/common';
+import { CreateNewEventDto } from 'src/dto/create-new-event.dto';
+import { UpdateEventDto } from 'src/dto/update-event.dto';
+import { MainPagePortfolio, NewBuySellAdded } from 'src/models/coin-related.model';
+import { CoinsBuyService } from './coins-buy.service';
+import { CoinsDeleteService } from './coins-delete.service';
+import { CoinsEventDeleteService } from './coins-event-delete.service';
+import { CoinsEventUpdateService } from './coins-event-update.service';
+import { CoinsGetService } from './coins-get.service';
+import { CoinsNewService } from './coins-new-coin.service';
+import { CoinsSellService } from './coins-sell.service';
 
-@ApiTags('coins')
 @Controller('coins')
 export class CoinsController {
-  constructor(private readonly coinsService: CoinsService) {}
+  private logger = new Logger('CoinsController');
+  constructor(
+    private readonly coinsNewService: CoinsNewService,
+    private readonly coinsBuyService: CoinsBuyService,
+    private readonly coinsSellService: CoinsSellService,
+    private readonly coinsEventUpdateService: CoinsEventUpdateService,
+    private readonly coinsEventDeleteService: CoinsEventDeleteService,
+    private readonly coinsDeleteService: CoinsDeleteService,
+    private readonly coinsGetService: CoinsGetService
+    ){}
 
-  @ApiOkResponse({ type: Coin, isArray: true })
-  @ApiQuery({ name: 'coinName', required: false })
-  @Get()
-  async findAll(@Query('coinName') coinName: string): Promise<Coin[]> {
-    // How to throw an error (400 Bad Request) when the query param key is mispelled/missing/invalid?
+  @Post('/')
+  async createNewCoin(@Body() coin:CreateNewEventDto){
 
-    return this.coinsService.findAll(coinName);
+    return await this.coinsNewService.createNewCoin(coin);
+
   }
 
-  @ApiOkResponse({ type: Coin })
-  @Get(':id')
-  async find(@Param('id', ParseIntPipe) id: number): Promise<Coin> {
-    return this.coinsService.find(id);
+  // Ensure coinName is LOWERCASE when passed as a param for both buy and sell
+  // when received, switch to UPPERCASE FOR FIRST LETTER
+  @Post('buy/:coinName')
+  async createBuyEvent(
+    @Param('coinName') coinName: string,
+    @Body() coin:CreateNewEventDto
+  ){
+    const newBuyEvent: NewBuySellAdded = await this.coinsBuyService.createNewBuy(coinName, coin);
+    return newBuyEvent;
   }
 
-  @ApiCreatedResponse({ type: Coin })
-  @Post()
-  async create(@Body() coin: CreateCoinDto): Promise<void> {
-    try {
-      await this.coinsService.create(coin);
-    } catch (err) {
-      console.error(err);
-    }
+  @Post('sell/:coinName')
+  async createSellEvent(
+  @Param('coinName') coinName: string,
+  @Body() coin:CreateNewEventDto
+  ){
+
+    return await this.coinsSellService.createNewSell(coinName, coin);
+
   }
 
-  @ApiCreatedResponse({ type: Coin })
-  @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() coin: UpdateCoinDto,
-  ): Promise<number> {
-    return this.coinsService.update(id, coin);
+  // PATCH and not PUT as the update is not necessarily meant to update the all of the fields of an event log
+  // PATCH only updates the fields that were supplied, leaving the others alone.
+  // hence all fields/params of an event are not required to be in the request body
+  @Patch('update/:eventId')
+  async updateBuySellEvent(
+  @Param('eventId') eventId: number,
+  @Body() buySellEvent:UpdateEventDto
+  ){
+
+    return await this.coinsEventUpdateService.updateEventLog(eventId, buySellEvent);
+
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: number): Promise<string> {
-    return this.coinsService.delete(id);
+  // Delete the coin from portfolio & all events associated with it
+  @Delete('delete/:coinName')
+  async deleteCoin(
+    @Param('coinName') coinName: string
+  ){
+
+    return await this.coinsDeleteService.deleteCoin(coinName);
+
   }
+
+  // Delete a specifc event for a specific coin from the BuySellEvent table
+  @Delete('delete/:coinName/:eventId')
+  async deleteBuySellEvent(
+    @Param('coinName') coinName: string,
+    @Param('eventId') eventId: number
+  ){
+
+    return await this.coinsEventDeleteService.deleteEventLog(coinName, eventId);
+
+  }
+
+  // Get all the coins from the Portfolio table
+  @Get('/')
+  async getAllCoins():Promise<MainPagePortfolio[]>{
+    return await this.coinsGetService.getAllPortfolioCoins()
+  }
+
+  // Get all the events for a specific coin
+  @Get(':coinName')
+  async getAllSpecificCoinEvents(
+    @Param('coinName') coinName: string
+  ){
+    return await this.coinsGetService.getAllCoinEvents(coinName)
+  }
+
 }

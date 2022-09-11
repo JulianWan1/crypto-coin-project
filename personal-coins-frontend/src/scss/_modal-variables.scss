@@ -1,0 +1,40 @@
+// 3. Modals Variables
+// 3.1 Modal Fonts
+$modal-font-family-general: "Avenir";
+$modal-font-weight-general: 500;
+$modal-font-size-general: 15px;
+$modal-font-size-title: 25px;
+$modal-font-weight-title: 600;
+$modal-font-size-sub-title: 20px;
+$modal-font-weight-sub-title: 500;
+$modal-font-weight-fields: 500;
+
+// 3.2 Modal Colours & Opacities
+$modal-background-colour: #28475C;
+$modal-accent-colour: #2F8886;
+$modal-accent-border-colour: #5db5b4;
+$modal-accent-box-shadow-colour: 0 0 0 0.125em rgba(47, 136, 134, 0.25);
+
+$modal-font-colour-general: white;
+$modal-font-colour-title: white;
+$modal-font-colour-sub-title: white;
+$modal-font-colour-fields: white;
+
+$modal-button-wording-colour-general: white;
+$modal-button-wording-colour-disabled: rgba(255, 255, 255, 0.75);
+
+$modal-button-opacity: 0.85;
+$modal-button-opacity-focus-hover-active: 1.0;
+$modal-button-opacity-disabled: 0.45;
+
+$modal-button-colour-submit: #48c78e; 
+$modal-button-border-colour-submit: #76efc7;
+$modal-button-box-shadow-colour-submit: 0 0 0 0.125em rgba(55, 136, 109, 0.455);
+
+$modal-button-colour-delete: #fa5252;
+$modal-button-border-colour-delete: #f08d8d;
+$modal-button-box-shadow-colour-delete: 0 0 0 0.125em rgba(213, 87, 87, 0.25);
+
+// 3.3 Mobile & Tablet Support
+$modal-mobile-max-width: 625px;
+$modal-tablet-max-width: 1023px;

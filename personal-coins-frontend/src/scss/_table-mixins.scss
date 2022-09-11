@@ -1,0 +1,434 @@
+// 2. Mixins For Tables
+
+// 2.1 For Table in General
+@mixin tableDefault(){
+  width: 100%;
+  // To change the CSS of table related objects
+  // When checking using dev console on browser, check on table is-hoverable class
+  ::v-deep table{
+    background-color: $table-background-colour;
+    color: $table-font-colour-general;
+    // Deals with the table header
+    &.table th{
+      color: $table-font-colour-general;
+      background-color: $table-background-colour;
+    }
+    // Deals with table border when active/focused
+    &:active{
+      border-color: $table-accent-border-colour;
+    }
+    &:focus{
+      border-color: $table-accent-border-colour;
+      box-shadow: $table-accent-box-shadow-colour;
+    }
+    // When hovering over a row in the table
+    &.is-hoverable tbody tr:not(.is-selected){
+      &:hover{
+        background-color: $table-row-hover-colour;
+        cursor: pointer;
+      }
+    }
+    // When row is selected
+    &.is-hoverable tbody tr.is-selected{
+      background-color: $table-accent-colour;
+    }
+  }
+  // To set the header's column text to be centered
+  ::v-deep {
+    .th-wrap{
+      justify-content: center;
+    }
+  }
+  // When the window is set to a smaller size, the table will make the rows into cards
+  // This deals with the CSS of the table, cards and other changed features
+  ::v-deep{
+    .table-wrapper.has-mobile-cards .table.is-hoverable{
+      background-color: $table-mobile-card-background-colour;
+    }
+    .table-wrapper.has-mobile-cards tr:not([class*=is-]) {
+      background-color: $table-background-colour;
+    }
+  }
+  // Deals with the dropdown button for column sorting (when in mobile mode)
+  ::v-deep{
+    .button.is-primary{
+      background-color: $table-accent-colour;
+    }
+    .button.is-primary:focus:not(:active){
+      box-shadow: $table-accent-box-shadow-colour;
+    }
+    .select:not(.is-multiple):not(.is-loading)::after {
+      border-color: $table-accent-border-colour;
+    }
+    .select select:focus{
+      border-color: $table-accent-border-colour;
+      box-shadow:  $table-accent-box-shadow-colour;
+    }
+  }
+}
+
+// 2.2 For Table in General (.b-table)
+@mixin b-tableDefault(){
+  ::v-deep{
+    .table-wrapper.has-sticky-header tr:first-child th{
+      background: $table-background-colour;
+    }
+  }
+}
+
+// 2.3 For Table Container (Deals with the position of the table relative to page)
+@mixin tableContainer(){
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 40px 90px 50px 90px;
+}
+
+// 2.4 For Buttons accompanying Coin Table (at the top of table)
+@mixin coinTableButtonsDefault(){
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  // mobile default
+  @media screen and (max-width: $table-mobile-max-width) {
+    flex-direction: column;
+  }
+  &__no-coin-selected-button{
+    .button{
+      width: 120px;
+      border-radius: 5px;
+      padding: 10px;
+      &__new-coin{
+        background-image: linear-gradient($table-button-colour-submit 0, $table-button-colour-submit 100%);
+        opacity: $table-button-opacity;
+        border-color: transparent;
+        color: $table-button-wording-colour-general;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        font-family: $table-font-family-general;
+        font-weight: $table-font-weight-general;
+        &:disabled{
+          opacity: $table-button-opacity-disabled;
+          border-color: transparent;
+          color: $table-button-wording-colour-disabled;
+        }
+        &:disabled:hover{
+          opacity: $table-button-opacity-disabled;
+          border-color: transparent;
+          color: $table-button-wording-colour-disabled;
+        }
+        &:not(:disabled):hover{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: transparent;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-submit;
+          box-shadow: $table-button-box-shadow-colour-submit;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus:not(:active){
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-submit;
+          box-shadow: $table-button-box-shadow-colour-submit;
+          color: $table-button-wording-colour-general;
+        }
+      }
+    }    
+  }
+  &__coin-selected-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 400px;
+    // mobile default style
+    @media screen and (max-width: $table-mobile-max-width) {
+      flex-direction: column;
+      width: auto;
+      height: 150px;
+      align-self: center;
+      align-content: space-between;
+    }
+    .button{
+      width: 120px;
+      border-radius: 5px;
+      padding: 10px;
+      &__buy-sell{
+        background-image: linear-gradient($table-button-colour-submit 0, $table-button-colour-submit 100%);
+        opacity: $table-button-opacity;
+        border-color: transparent;
+        color: $table-button-wording-colour-general;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        font-family: $table-font-family-general;
+        font-weight: $table-font-weight-general;
+        &:disabled{
+          opacity: $table-button-opacity-disabled;
+          border-color: transparent;
+          color: $table-button-wording-colour-disabled;
+        }
+        &:disabled:hover{
+          opacity: $table-button-opacity-disabled;
+          border-color: transparent;
+          color: $table-button-wording-colour-disabled;
+        }
+        &:not(:disabled):hover{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: transparent;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-submit;
+          box-shadow: $table-button-box-shadow-colour-submit;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus:not(:active){
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-submit;
+          box-shadow: $table-button-box-shadow-colour-submit;
+          color: $table-button-wording-colour-general;
+        }
+      }
+      &__view-log{
+        background-image: linear-gradient($table-accent-colour 0, $table-accent-colour 100%);
+        opacity: $table-button-opacity;
+        border-color: transparent;
+        color: $table-button-wording-colour-general;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        font-family: $table-font-family-general;
+        font-weight: $table-font-weight-general;
+        &:hover{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: transparent;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-accent-border-colour;
+          box-shadow: $table-accent-box-shadow-colour;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus:not(:active){
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-accent-border-colour;
+          box-shadow: $table-accent-box-shadow-colour;
+          color: $table-button-wording-colour-general;
+        }
+      }
+      &__delete{
+        background-image: linear-gradient($table-button-colour-delete 0, $table-button-colour-delete 100%);
+        opacity: $table-button-opacity;
+        border-color: transparent;
+        color: $table-button-wording-colour-general;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        font-family: $table-font-family-general;
+        font-weight: $table-font-weight-general;
+        &:hover{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: transparent;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-delete;
+          box-shadow: $table-button-box-shadow-colour-delete;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus:not(:active){
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-delete;
+          box-shadow: $table-button-box-shadow-colour-delete;
+          color: $table-button-wording-colour-general;
+        }
+      }
+    }
+  };
+}
+
+// 2.5 For Buttons accompanying Event Table (at the top of the table)
+@mixin eventTableButtonsDefault(){
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 30px;
+  width: 400px;
+  @media screen and (max-width: $table-mobile-max-width) {
+    flex-direction: column;
+    align-self: center;
+    justify-content: space-between;
+    width: auto;
+  }
+  &__event-not-selected-buttons{
+    margin-right: 20px;
+    @media screen and (max-width: $table-mobile-max-width) {
+      margin-right: 0px;
+    }
+    .button{
+      width: 160px;
+      border-radius: 5px;
+      padding: 10px;
+      &__back-to-portfolio{
+        background-image: linear-gradient($table-accent-colour 0, $table-accent-colour 100%);
+        opacity: $table-button-opacity;
+        border-color: transparent;
+        color: $table-button-wording-colour-general;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        font-family: $table-font-family-general;
+        font-weight: $table-font-weight-general;
+        &:hover{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: transparent;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-accent-border-colour;
+          box-shadow: $table-accent-box-shadow-colour;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus:not(:active){
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-accent-border-colour;
+          box-shadow: $table-accent-box-shadow-colour;
+          color: $table-button-wording-colour-general;
+        }
+      }
+    }
+  }
+  &__event-selected-buttons{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    @media screen and (max-width: $table-mobile-max-width) {
+      margin-top: 20px;
+    }
+    .button{
+      width: 120px;
+      border-radius: 5px;
+      padding: 10px;
+      &__update-event{
+        background-image: linear-gradient($table-button-colour-submit 0, $table-button-colour-submit 100%);
+        opacity: $table-button-opacity;
+        border-color: transparent;
+        color: $table-button-wording-colour-general;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        font-family: $table-font-family-general;
+        font-weight: $table-font-weight-general;
+        margin-right: 20px;
+        &:disabled{
+          opacity: $table-button-opacity-disabled;
+          border-color: transparent;
+          color: $table-button-wording-colour-disabled;
+        }
+        &:disabled:hover{
+          opacity: $table-button-opacity-disabled;
+          border-color: transparent;
+          color: $table-button-wording-colour-disabled;
+        }
+        &:not(:disabled):hover{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: transparent;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-submit;
+          box-shadow: $table-button-box-shadow-colour-submit;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus:not(:active){
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-submit;
+          box-shadow: $table-button-box-shadow-colour-submit;
+          color: $table-button-wording-colour-general;
+        }
+      }
+
+      &__delete-event{
+        background-image: linear-gradient($table-button-colour-delete 0, $table-button-colour-delete 100%);
+        opacity: $table-button-opacity;
+        border-color: transparent;
+        color: $table-button-wording-colour-general;
+        transition: all .3s cubic-bezier(.05, .03, .35, 1);
+        font-family: $table-font-family-general;
+        font-weight: $table-font-weight-general;
+        &:hover{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: transparent;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus{
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-delete;
+          box-shadow: $table-button-box-shadow-colour-delete;
+          color: $table-button-wording-colour-general;
+        }
+        &:focus:not(:active){
+          opacity: $table-button-opacity-focus-hover-active;
+          border-color: $table-button-border-colour-delete;
+          box-shadow: $table-button-box-shadow-colour-delete;
+          color: $table-button-wording-colour-general;
+        }
+      }
+    }
+  };
+}
+
+// 2.6 Pagination
+@mixin paginationStyleDefault(){
+  ::v-deep{
+    // Deals with the page button styles
+    .pagination-list li .pagination-link{
+      color: $table-font-colour-general;
+      background-color: $table-pagination-background-colour;
+      &:focus{
+        border-color: $table-pagination-border-colour-focused;
+      }
+      &.is-current{
+        background-color: $table-pagination-is-current-background-colour;
+        border-color: $table-pagination-is-current-border-colour;
+      }
+    }
+    // Deals with the arrow button (next and previous page) styles
+    .pagination-link{ 
+      background-color: $table-pagination-background-colour;
+      border-color: $table-pagination-border-colour;
+      &:focus{
+        border-color: $table-pagination-border-colour-focused;
+      }
+    }
+    .icon svg {
+      height: 20px;
+      color: $table-font-colour-general;
+    }
+  }
+}
+
+// Deals with the pagination dropdown (number of rows per page) styles
+@mixin selectPaginationStyleDefault(){
+  ::v-deep{
+    .select select{
+      color: $table-font-colour-general;
+      background-color: $table-pagination-background-colour;
+      border-color: $table-pagination-border-colour;
+      font-family: $table-font-family-general;
+      font-weight: $table-font-weight-general;
+      &:focus{
+        border-color: $table-pagination-border-colour-focused;
+        box-shadow: $table-accent-box-shadow-colour;       
+      }
+    }
+    .select:not(.is-multiple):not(.is-loading)::after{
+      border-color: $table-font-colour-general;
+    }
+  }
+}
+
+// 2.7 Toast Button
+@mixin toastButtonDefault(){
+  &.is-danger{
+    align-self: center;
+    margin-top: 10vh;
+    width: 20vw;
+  }
+}
