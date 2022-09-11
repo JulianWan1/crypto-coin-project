@@ -20,9 +20,6 @@ import CoinEventLogTableComponent from "../components/CoinEventLogTableComponent
 })
 export default class CoinEventLogView extends Vue {
   coinNameRetrieved: string = this.$route.params.coinName;
-  mounted(){
-    console.log(this.coinNameRetrieved);
-  }
 }
 
 </script>

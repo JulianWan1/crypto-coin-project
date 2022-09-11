@@ -9,7 +9,6 @@ export class CoinsDeleteService{
   // constructor(private readonly generalPortfolioUpdate:GeneralPortfolioUpdate){}
   async deleteCoin(coinName: string){
     coinName = coinName[0].toUpperCase() + coinName.slice(1);
-    this.logger.log(`Transformed toUpperCase coinName: ${coinName}`);
 
     // Get the coin from the portfolio table
     const coinPresentList: Portfolio[] = 

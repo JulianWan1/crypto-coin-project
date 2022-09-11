@@ -50,7 +50,6 @@ export class CoinEventLogStore extends VuexModule {
   @Action
   async updateSpecificCoinEvent(requestBody:CoinEventUpdateRequestBody):Promise<any>{
     if (this.isLoading) {
-      console.log(this.isLoading)
       return
     }
     await this.context.commit('mutateLoadingStatus', true);
@@ -73,7 +72,6 @@ export class CoinEventLogStore extends VuexModule {
   @Action
   async deleteSpecificCoinEvent(selectedEventRowDetails:CoinEvent):Promise<any>{
     if (this.isLoading) {
-      console.log(this.isLoading)
       return
     }
     await this.context.commit('mutateLoadingStatus', true);

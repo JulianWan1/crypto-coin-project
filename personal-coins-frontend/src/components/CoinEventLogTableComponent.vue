@@ -254,11 +254,6 @@ export default class CoinEventLogTableComponent extends Vue {
     this.selectedEventRow = null
   }
 
-  @Watch('selectedEventRow')
-  logSelectedStatus(){
-    console.log(`Selected/Updated Event for ${this.coinName}: ${JSON.stringify(this.selectedEventRow)}`);
-  }
-
   // 2. Functionalities for Update Coin Event & its Confirmation Modal 
 
   // 2.1 Open and close the modal
@@ -329,8 +324,6 @@ export default class CoinEventLogTableComponent extends Vue {
     )
     // If return error from BE, return it to FE, set error toast & message in modal and do not close modal
     // This is if the modal update returns any error from BE (e.g. the modal has the)
-    console.log(`Submit to Store from table component: ${JSON.stringify(this.requestBody)}`);
-    console.log(`Submit to store from table component (FULL MODAL DETAILS): ${JSON.stringify(mainCoinModalDetails)}`); 
 
     // Get the differences between the current selectedRow and the newly updated requestBody
     // Place them in buySellEventBeforeUpdateRelevantFields & buySellEventAfterUpdateRelevantFields objects respectively
@@ -380,16 +373,12 @@ export default class CoinEventLogTableComponent extends Vue {
         }
       }
       for(const message of confirmationMessageList){
-        console.log(message)
         this.updateConfirmationMessage = this.updateConfirmationMessage.concat(message);
       }
-      console.log(`Confirmation Message: ${this.updateConfirmationMessage}`)
       // Close the modal
       this.changeUpdateCoinEventModalStatus();
-      console.log(`isUpdateCoinEventModalActive: ${this.isUpdateCoinEventModalActive}`);
       // Open Confirm Update Modal
       this.changeConfirmationModalStatus();
-      console.log(`isUpdateCoinEventConfirmationModalActive: ${this.isUpdateCoinEventConfirmationModalActive}`)
     }
   }
 
@@ -409,7 +398,6 @@ export default class CoinEventLogTableComponent extends Vue {
         } 
       }
     }
-    console.log(`confirmUpdateCoinEvent:${JSON.stringify(convertedRequestBody)}`)
     let response = await this.store.updateSpecificCoinEvent(convertedRequestBody)
     // Check if the update was successful or not
     await this.updateSuccessOrFailure(response, convertedRequestBody)
@@ -417,7 +405,6 @@ export default class CoinEventLogTableComponent extends Vue {
     this.loadingStatus = false;
     // Clear the updateConfirmationMessage back to empty string
     this.updateConfirmationMessage = ``;
-    console.log(`cleared updateConfirmationMessage post update: ${this.updateConfirmationMessage}`)
   }
 
   // 2.7 Retrieve Update Success or Failure Response
@@ -425,7 +412,6 @@ export default class CoinEventLogTableComponent extends Vue {
     // If update is successful (status 200) (which returns success response), toast, get the updated data from store, update the selectedEventRow and close modal
     // If update fails (status 400, 403, 500), return toast with error and keep modal open with error msg
     if(response && response.status === 200){
-      console.log(response);
     // Retrieve before and after data for the toast & set the message for the success update event
     // Set the properties for buySellEventBeforeUpdateRelevantFields & buySellEventAfterUpdateRelevantFields
     // Have to use UpdateModalFields interface which uses index signature as assigning the properties
@@ -483,7 +469,6 @@ export default class CoinEventLogTableComponent extends Vue {
       // Pop up the success toast (indefinite)
       this.successToast = successToastMethod(this.successToast, successMessage)
     }else{
-      console.log(response);
       const errorMessage = response.message 
       // Close update confirmation modal and reopen the update modal
       this.closeUpdateConfirmationModalAndOpenUpdateModal();
@@ -519,7 +504,6 @@ export default class CoinEventLogTableComponent extends Vue {
   // 3.4 Retreive Successful or Failed Delete Coin Event Response
   async deleteResponseSuccessOrFailure(response:any){
     if(response && response.status === 200){
-      console.log(response);
       const {id, eventType, eventDate} = response.data.deletedEventsFromDB
       const transformedEventDate:string =  new Date(eventDate).toLocaleString()
       const successMessage = `${eventType === 2 ? 'Buy': 'Sell'} event #${id} on ${transformedEventDate} from ${this.coinName[0].toUpperCase()+this.coinName.slice(1)} has been successfully deleted`

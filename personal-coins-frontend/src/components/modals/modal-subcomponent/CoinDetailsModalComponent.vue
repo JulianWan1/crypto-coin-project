@@ -138,14 +138,12 @@ export default class CoinDetailsModalComponent extends Vue{
       }
       this.isAnUpdateEventModalType = this.updateEventModalType
     }
-    console.log(`From CoinDetailsModalComponent mounted: ${JSON.stringify(this.partialCoinModalDetails)}`)
 
     // Set the initialDateOfEvent to the selected event row's event date
     // This is also to ensure if any re-mounts (rediting of updates in modal by user)
     // was done, the initialDateOfEvent will always refer to the selected event's event date only
     if(this.eventDateFromSelectedEvent){
       this.initialDateOfEvent = this.eventDateFromSelectedEvent as Date;
-      console.log(`initialDateOfEvent: ${this.initialDateOfEvent}`);
     }
   }
 
@@ -195,7 +193,6 @@ export default class CoinDetailsModalComponent extends Vue{
         }
     }
     this.isDisabled = hasError;
-    console.log(`From CoinDetailsModalComponent detectValueFromField:${JSON.stringify(this.partialCoinModalDetails)}`)
     this.$emit('retrievePartialCoinModalDetails', this.partialCoinModalDetails, this.isDisabled)
   }
 
