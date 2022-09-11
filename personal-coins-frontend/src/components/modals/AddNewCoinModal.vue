@@ -105,11 +105,8 @@ export default class AddNewCoinModal extends Vue {
   // Important as to ensure the data within this modal is reset to this default setting
   @Watch('isActive')
   coinModalDetailsToNullMethod(){
-    console.log('reverting mainCoinModalDetails to null...');
     this.mainCoinModalDetails = null;
     this.submitAddCoinButtonStatusIsDisabled = true;
-    console.log(`mainCoinModalDetails: ${JSON.stringify(this.mainCoinModalDetails)}`)
-    console.log(`submitAddCoinButtonStatusIsDisabled: ${this.submitAddCoinButtonStatusIsDisabled}`)
   }
 
   // Whenever loading page is triggered, ensure that add coin button is disabled
@@ -134,7 +131,6 @@ export default class AddNewCoinModal extends Vue {
         this.availableCoinOptionsList.push(option);
         this.selectedCoinOptionName = this.availableCoinOptionsList[0].coinName!;
         this.coinOptionDropdownDisabled = false;
-        console.log(`availableCoinOptionsList: ${JSON.stringify(this.availableCoinOptionsList)}`)
       }
       // If all coin options have been bought, then set the option dropdown to be disabled and empty
       // This should in turn disable the add new coin ability since no new coin can be added
@@ -142,13 +138,10 @@ export default class AddNewCoinModal extends Vue {
         this.listOfExistingCoins.includes(option.coinName!) && 
         this.availableCoinOptionsList.length === 0
       ){
-        console.log(`availableCoinOptionsList: ${JSON.stringify(this.availableCoinOptionsList)}`)
         this.selectedCoinOptionName = '';
         this.coinOptionDropdownDisabled = true;
       }
     }
-    console.log(JSON.stringify(this.listOfExistingCoins))
-    console.log(JSON.stringify(this.availableCoinOptionsList))
   }
 
   closeModalFunction(){
@@ -167,7 +160,6 @@ export default class AddNewCoinModal extends Vue {
     if(this.coinOptionDropdownDisabled){
       this.submitAddCoinButtonStatusIsDisabled = true;
     }
-    console.log(`mainCoinModalDetails from AddNewCoinModal: ${JSON.stringify(this.mainCoinModalDetails)}`)
   }
 
   // Set the selectedCoinOption from the coinOptionsList based on the selectedCoinOptionName
@@ -184,7 +176,6 @@ export default class AddNewCoinModal extends Vue {
     // First get the selected coin to be added from the coinOptionsList
     this.getSelectedCoin(this.selectedCoinOptionName);
     this.$emit(`triggerAddNewCoinEvent`, this.mainCoinModalDetails, this.selectedCoinOption);
-    console.log(`mainCoinModalDetails after add new coin attempt: ${JSON.stringify(this.mainCoinModalDetails)}`);
   }
 
 }

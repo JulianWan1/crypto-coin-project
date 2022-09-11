@@ -11,7 +11,6 @@ export class CoinsEventDeleteService{
   constructor(private readonly generalPortfolioUpdate:GeneralPortfolioUpdate){}
   async deleteEventLog(coinName: string, eventId: number){
     coinName = coinName[0].toUpperCase() + coinName.slice(1);
-    this.logger.log(`Transformed toUpperCase coinName: ${coinName}`);
 
     // Get the coin from the portfolio table
     const coinPresentList: Portfolio[] = 
@@ -30,7 +29,6 @@ export class CoinsEventDeleteService{
         {column:'eventDate', order:'asc'},
         {column:'eventType', order:'asc'}
       ])
-    this.logger.log(`coinEventLog: ${JSON.stringify(coinEventLog)}`)
     // Check if the event id is found from the coinEventLog
     // Make eventLog a copy of the event that is to be updated
     let eventLog: BuySellCoinEvent;
@@ -44,7 +42,6 @@ export class CoinsEventDeleteService{
       }
     }
     this.logger.log(`Event log selected for removal: ${JSON.stringify(eventLog)}`)
-    this.logger.log(`All buy events for this coin: ${JSON.stringify(allBuyEvents)}`)
     if(!eventLog){
       throw new EventLogNotFoundException;
     }
@@ -64,9 +61,6 @@ export class CoinsEventDeleteService{
       // could use indexOf instead but used for loop
       // check if the coinEventLog[i].id is equals to eventLog.id and if so, remove from the coinEventLog
       for(let i = 0; i < coinEventLog.length; i++){
-        this.logger.log(`coinEventLog[i]: ${JSON.stringify(coinEventLog[i])}`);
-        this.logger.log(`eventLog: ${JSON.stringify(eventLog)}`);
-        this.logger.log(`coinEventLog[i].id is equals to eventLog.id? : ${coinEventLog[i].id === eventLog.id}`);
         if(coinEventLog[i].id === eventLog.id){
           const removedEvent:BuySellCoinEvent[] = coinEventLog.splice(i,1);
           this.logger.log(`Removed buy event from coinEventLog: ${JSON.stringify(removedEvent)}`)
@@ -113,13 +107,11 @@ export class CoinsEventDeleteService{
         proceedingDCAEvents.push(allNewDCAEventsList[i]);
       }
     }
-    this.logger.log(`All proceedingDCAEvents: ${JSON.stringify(proceedingDCAEvents)}`);
     for(let i = 0; i < allNewSellEventsList.length; i++){
       if(new Date(allNewSellEventsList[i].eventDate).getTime() > new Date(eventLog.eventDate).getTime()){
         proceedingSellEvents.push(allNewSellEventsList[i]);
       }
     }
-    this.logger.log(`All proceedingSellEvents: ${JSON.stringify(proceedingSellEvents)}`);
 
     // Recalculate the DCA events in the coinEventLog and update them
     for(let i = 0; i < proceedingDCAEvents.length; i++){

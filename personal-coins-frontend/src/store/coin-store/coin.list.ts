@@ -50,11 +50,9 @@ export class CoinListStore extends VuexModule {
   @Action
   async makeBuySellCoinRequest({requestBody, selectedBuyOrSellOption}:MakeBuySellCoinRequestParameter): Promise<any> {
     if (this.isLoading) {
-      console.log(`makeBuySellCoinRequest is loading: ${this.isLoading}`)
       return;
     }
     await this.context.commit('mutateLoadingStatus', true);
-    console.log(`successfully mutateLoadingStatus: ${this.isLoading} `)
     const {coinName} = requestBody;
     const coinNameToLowerCase = coinName.toLowerCase();
     try {
@@ -72,11 +70,9 @@ export class CoinListStore extends VuexModule {
   @Action
   async makeAddNewCoinRequest(requestBody:BuySellCreateCoinRequestBody): Promise<any> {
     if(this.isLoading){
-      console.log(`makeAddNewCoinRequest is Loading: ${this.isLoading}`)
       return;
     }
     await this.context.commit('mutateLoadingStatus', true);
-    console.log(`successfully mutateLoadingStatus: ${this.isLoading} `)
 
     try{
       const response = await axios.post(`${Endpoints.Coins}`, requestBody)
@@ -97,7 +93,6 @@ export class CoinListStore extends VuexModule {
       return;
     }
     await this.context.commit('mutateLoadingStatus', true);
-    console.log(`successfully mutateLoadingStatus: ${this.isLoading} `)
 
     const coinNameToLowerCase = coinName.toLowerCase();
     try{
@@ -115,7 +110,6 @@ export class CoinListStore extends VuexModule {
   @Action
   async setIsLoadingToFalse(){
     await this.context.commit('mutateLoadingStatus', false);
-    console.log(`mutateLoadingStatus is set to ${this.isLoading}`)
   }
 
 }

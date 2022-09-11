@@ -251,12 +251,10 @@ export default class CoinTableComponent extends Vue {
     await this.getPortfolioCoinTableData();
     // Once retrieved the table data, stop loading screen
     this.loadingStatus = false;
-    console.log(`starting portfolioCoinList:${JSON.stringify(this.portfolioCoinList)}`);
     // Call the function that calls the live coin watch single coin api every 10 minutes
     setInterval(
       async() => {
         await this.currentCoinMarketPriceRetriever(this.initialPortfolioCoinList)
-        console.log(`portfolioCoinList after interval: ${JSON.stringify(this.portfolioCoinList)}`)
       },
       this.setAPICallTime
     );
@@ -268,7 +266,6 @@ export default class CoinTableComponent extends Vue {
     await this.store.getCoinList();
     // Populate the initialPortfolioCoinList variable
     this.initialPortfolioCoinList = this.store.portfolioCoinList;
-    console.log(`retrieved initialPortfolioCoinList: `, (JSON.stringify(this.initialPortfolioCoinList)));
     // Set the coinsAlreadyBought back to an empty string array 
     // (this will help retrigger the watcher on listOfExistingCoins prop in AddNewCoinModal to reset availableCoinOptionsList within it)
     this.coinsAlreadyBought = [];
@@ -276,7 +273,6 @@ export default class CoinTableComponent extends Vue {
     for(let i = 0; i < this.initialPortfolioCoinList.length ;i++){
       this.coinsAlreadyBought.push(this.initialPortfolioCoinList[i].coinName);
     }
-    console.log(`Coin names of already bought coins: ${JSON.stringify(this.coinsAlreadyBought)}`)
     // Apply the newly populated initialPortfolioCoinList to the currentCoinMarketPriceRetriever to get their respective current coin market price
     await this.currentCoinMarketPriceRetriever(this.initialPortfolioCoinList);
   }
@@ -289,7 +285,6 @@ export default class CoinTableComponent extends Vue {
     for(let i = 0; i < portfolioCoinList.length; i++){
       const marketPriceAndProfitLossPercentage: UnrealisedProfitLossPercentageCalculatorResponse = 
         await this.liveCoinWatchFunctions.unrealisedProfitLossPercentageCalculator(portfolioCoinList[i]);
-      console.log(JSON.stringify(marketPriceAndProfitLossPercentage));
       const {currentCoinMarketPrice, unrealisedProfitLossPercentage} = marketPriceAndProfitLossPercentage;
       if(
         marketPriceAndProfitLossPercentage &&
@@ -312,7 +307,6 @@ export default class CoinTableComponent extends Vue {
     // despite the portfolioCoinList is updated with the new currentCoinMarketPrice & unrealisedProfitLossPercentage (only with spread operator will it work)
     // The getPortfolioCoinTableData however when called will update both the portfolioCoinList and the table
     this.portfolioCoinList = [...portfolioCoinList];
-    console.log(`Newly updated portfolio coin list: ${JSON.stringify(this.portfolioCoinList)}`);
   }
 
   deselectRowMethod(){
@@ -321,7 +315,6 @@ export default class CoinTableComponent extends Vue {
 
   @Watch('selectedCoinRow')
   setSelectedCoinRow(){
-    console.log(`Selected Portfolio Coin: ${JSON.stringify(this.selectedCoinRow)}`);
     if(this.selectedCoinRow){
       this.selectedRowCoinName = this.selectedCoinRow.coinName;
       this.selectedRowCoinCode = this.selectedCoinRow.coinCode;
@@ -353,8 +346,6 @@ export default class CoinTableComponent extends Vue {
   async submitBuySellCoinEvent(mainCoinModalDetails:CoinModalFieldData, selectedBuyOrSellOption:string){
     // Open loading screen
     this.loadingStatus = true;
-    console.log(`submitBuySellCoinEvent's coinName & coinCode ${this.selectedRowCoinName}, ${this.selectedRowCoinCode}`)
-    console.log(`mainCoinModalDetails from submitBuySellCoinEvent: ${JSON.stringify(mainCoinModalDetails)}`)
     // Set the requestBody that is to be sent to the API in the store
     const{
       quantity,
@@ -393,7 +384,6 @@ export default class CoinTableComponent extends Vue {
     // If update is successful (status 200) (which returns success response), toast, get the updated data from store, update the selectedEventRow and close modal
     // If update fails (status 400, 403, 500), return toast with error and keep modal open with error msg
     if(response && response.status === 201){
-      console.log(response);
       // Retrieve the data of the buy sell event and set the message for it
       const buyOrSellString:string = response.data.latestBuySellEvent.buyQuantity? 'Buy' : 'Sell';
       const buyOrSellAmountString:number = response.data.latestBuySellEvent.buyQuantity? 
@@ -412,7 +402,6 @@ export default class CoinTableComponent extends Vue {
       // Pop up the success toast (indefinite)
       this.successToast = successToastMethod(this.successToast, successMessage)
     }else{
-      console.log(response);
       // Close loading screen
       this.loadingStatus = false;
       const errorMessage = response.message 
@@ -434,8 +423,6 @@ export default class CoinTableComponent extends Vue {
     async submitAddNewCoinEvent(mainCoinModalDetails:CoinModalFieldData, selectedCoinOption:Partial<BuySellCreateCoinRequestBody>){
     // Open loading screen
     this.loadingStatus = true;
-    console.log(`submitAddNewCoinEvent's coinName & coinCode: ${this.selectedRowCoinName}, ${this.selectedRowCoinCode}`)
-    console.log(`mainCoinModalDetails from submitAddNewCoinEvent: ${JSON.stringify(mainCoinModalDetails)}`)
     // Set the requestBody that is to be sent to the API in the store
     const{
       quantity,
@@ -468,7 +455,6 @@ export default class CoinTableComponent extends Vue {
     // If submission is successful (status 201) (which returns success response), toast, 
     // If submission fails (status 400, 403, 500), return toast with error and keep modal open with error msg
     if(response && response.status === 201){
-      console.log(response);
       // Retrieve the data of the add new coin event and set the message for it
       const newCoinName:string = response.data.latestCoin.coinName;
       const addNewCoinEventDate:string = new Date(response.data.latestCoinAddedDate).toLocaleString();
@@ -482,7 +468,6 @@ export default class CoinTableComponent extends Vue {
       // Pop up the success toast (indefinite)
       this.successToast = successToastMethod(this.successToast, successMessage)
     }else{
-      console.log(response);
       // Close loading screen
       this.loadingStatus = false;
       const errorMessage = response.message 
@@ -511,7 +496,6 @@ export default class CoinTableComponent extends Vue {
   async submitCoinDeletionEvent(){
     // Only need to use the selectedRow's coinName (in lowercase)
     this.loadingStatus = true;
-    console.log(`submitBuySellCoinEvent's coinName ${this.selectedRowCoinName}`);
 
     const deleteCoinResponse = await this.store.makeDeleteCoinRequest(this.selectedRowCoinName);
 
@@ -523,7 +507,6 @@ export default class CoinTableComponent extends Vue {
   // 3.4 Check Coin Deletion Response
   async deleteCoinResponseSuccessOrFailure(response:any){
     if(response && response.status === 200){
-      console.log(response);
       const successMessage = `${this.selectedRowCoinName} has been deleted from portfolio`
       // Get the updated coin data from the store then proceed with other following functions
       await this.getPortfolioCoinTableData();
@@ -536,7 +519,6 @@ export default class CoinTableComponent extends Vue {
       // Pop up the success toast (indefinite)
       this.successToast = successToastMethod(this.successToast, successMessage)
     }else{
-      console.log(response);
       // Close loading screen
       this.loadingStatus = false;
       const errorMessage = response.message 
