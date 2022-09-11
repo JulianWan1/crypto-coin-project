@@ -12,7 +12,6 @@ export class LiveCoinWatchFunctions {
       coinCode,
       currentDollarCostAverage
     } = coinObject;
-    console.log(`coinCode: ${coinCode}, currentDollarCostAverage: ${currentDollarCostAverage}`)
     // Set the request body for the API call to livecoinwatch
     // liveCoinWatchAxios is an instance of axios that already has the necessary baseURL and header set to make a complete call
     const singleCoinRequestBody: LiveCoinWatchSingleCoinRequest = {
@@ -35,9 +34,7 @@ export class LiveCoinWatchFunctions {
       }
       // Retrieve data from the API call
       const singleCoinData = await apiCall();
-      console.log(JSON.parse(JSON.stringify(singleCoinData)));
       const currentCoinMarketPrice: number = singleCoinData.rate;
-      console.log(`currentDollarCostAverage: ${currentDollarCostAverage}`);
       const unrealisedProfitLossPercentage: number | null = 
         // currentDollarCostAverage is read as a string variable type instead of number type, 
         // hence will regard 0 as "0", and mistakenly pass the ternary operator condition, and cause Infinity to be returned

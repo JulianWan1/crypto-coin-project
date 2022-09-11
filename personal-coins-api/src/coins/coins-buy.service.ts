@@ -30,7 +30,6 @@ export class CoinsBuyService {
     // Check if the coinName is found in the portfolio table (convert coinName to have uppercase for initial letter)
     // if found, get its respective id from portfolio table
     coinName = coinName[0].toUpperCase() + coinName.slice(1);
-    this.logger.log(`Transformed toUpperCase coinName: ${coinName}`);
 
     const coinPresent: Portfolio[] = 
       await Portfolio.query()

@@ -116,8 +116,6 @@ export default class UpdateCoinEventModal extends Vue {
     }else{
       this.mainCoinModalDetails = null;
     }
-
-    console.log(`From UpdateCoinEventModal: ${JSON.stringify(this.mainCoinModalDetails)}`)
   }
 
 // Retrieve the updated modal data from the child component (CoinDetailsModalComponent)
@@ -128,12 +126,10 @@ export default class UpdateCoinEventModal extends Vue {
   updateMainCoinModal(partialCoinModalDetails:CoinModalFieldData, isDisabled:boolean){
     this.mainCoinModalDetails = {...partialCoinModalDetails}
     this.updateButtonStatusIsDisabled = isDisabled;
-    console.log(`mainCoinModalDetails from updateCoinEventModal: ${JSON.stringify(this.mainCoinModalDetails)}`)
   }
 
   // Send data to the CoinEventLogTableComponent
   submitDataToCoinEventLogTableComponent(){
-    console.log(`Submitted Data to CoinEventLogTable: ${JSON.stringify(this.mainCoinModalDetails)}`)
     this.$emit('triggerUpdate', this.mainCoinModalDetails)
   }
 

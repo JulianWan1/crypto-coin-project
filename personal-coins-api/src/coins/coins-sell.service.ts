@@ -13,7 +13,6 @@ export class CoinsSellService {
   constructor(private readonly generalSellEvent: GeneralSellEvent){}
   async createNewSell(coinName:string, coin:CreateNewEventDto){
     coinName = coinName[0].toUpperCase() + coinName.slice(1);
-    this.logger.log(`Transformed toUpperCase coinName: ${coinName}`);
 
     // 1. Check if coin to sell exists
     // 2. Check if amount of coin to sell > 0
@@ -26,7 +25,6 @@ export class CoinsSellService {
     const coinPresentList: Portfolio[] = 
     await Portfolio.query()
       .where('coinName', '=', coinName)
-    this.logger.log(`coinPresent: ${JSON.stringify(coinPresentList)}`)
 
     // 1. Check if coin to sell exists in portfolio
     if(coinPresentList.length !== 1){

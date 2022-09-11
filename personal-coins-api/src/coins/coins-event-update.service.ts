@@ -39,7 +39,6 @@ export class CoinsEventUpdateService{
         {column:'eventDate', order:'asc'},
         {column:'eventType', order:'asc'}
       ])
-    this.logger.log(`coinEventLog: ${JSON.stringify(coinEventLog)}`)
     // Check if the event id is found from the coinEventLog
     // Make eventLog a copy of the event that is to be updated
     let eventLog: BuySellCoinEvent;
@@ -74,7 +73,6 @@ export class CoinsEventUpdateService{
         allBuyEvents.push(coinEventLog[i]);
       };
     };
-    this.logger.log(`allBuyEvents List: ${JSON.stringify(allBuyEvents)}`);
     if(eventDate){
       if(
         new Date(eventDate).getTime() <= 

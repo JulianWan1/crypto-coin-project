@@ -41,7 +41,7 @@ export default class GeneralSellEvent {
       throw new NoneOrNegativeBuySellAmount
     };
 
-    this.logger.log(`MP, NF, EP: ${[marketPrice, networkFee, exchangePremium]}`);
+    this.logger.log(`Market Price, Network Fee, Exchange Premium: ${[marketPrice, networkFee, exchangePremium]}`);
     this.logger.log(`sellQuantity: ${sellQuantity}`);
     const newPrice = marketPrice - ((networkFee + exchangePremium) / sellQuantity);
     sellEvent.aggregatePrice = newPrice;
