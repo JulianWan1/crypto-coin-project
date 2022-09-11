@@ -1,38 +1,41 @@
 <template>
-  <div class="event-log-container">
-    <div class="buttons-container">
+  <div class="table__container">
+    <div class="table__buttons">
+      <div
+        @click.stop
+        @click="closeToast"
+        class="table__buttons__event-not-selected-buttons"
+      >
+        <b-button
+          tag="router-link"
+          :to="{ name: 'PortfolioView' }"
+          class="button__back-to-portfolio"
+        >
+          Back to Portfolio
+        </b-button>
+      </div>
       <div 
-        class="event-selected-buttons"
         v-if="selectedEventRow"
         @click.stop
+        class="table__buttons__event-selected-buttons"
       >
         <b-button
           @click="changeUpdateCoinEventModalStatus"
+          class="button__update-event"
         >
           Update
         </b-button>
         <b-button
           @click="changeDeleteCoinEventModalStatus"
+          class="button__delete-event"
         >
           Delete
         </b-button>
       </div>
-      <div
-        class="back-to-portfolio-button"
-        @click.stop
-        @click="closeToast"
-      >
-        <b-button
-          tag="router-link"
-          :to="{ name: 'PortfolioView' }"
-        >
-          Back to Portfolio
-        </b-button>
-      </div>
     </div>
     <div 
-      class="update-coin-event-modal"
       @click.stop
+      class="update-coin-event-modal"
     >
       <UpdateCoinEventModal
         :isActive="isUpdateCoinEventModalActive"
@@ -44,8 +47,8 @@
       />
     </div>
     <div
-      class="confirm-update-event-modal"
       @click.stop
+      class="confirm-update-event-modal"
     >
       <UpdateCoinEventConfirmationModal
         :isActive="isUpdateCoinEventConfirmationModalActive"
@@ -57,8 +60,8 @@
       />
     </div>
     <div
-      class="delete-coin-event-modal"
       @click.stop
+      class="delete-coin-event-modal"
     >
       <DeleteCoinEventModal
         :isActive="isDeleteCoinEventModalActive"
@@ -76,7 +79,7 @@
       focusable
       :sticky-header="true"
       height="300px"  
-      class="table"
+      class="table__table"
     >
       <b-table-column field="id" label="ID" v-slot="props">
         {{ props.row.id }}
@@ -109,9 +112,10 @@
       :per-page="perPage"
       @change="onPageChange"
       style="height=10px"
+      class="table__pagination"
     >
     </b-pagination>
-    <b-select v-model="perPage">
+    <b-select v-model="perPage" class="table__select-pagination">
       <option value="5">5 per page</option>
       <option value="10">10 per page</option>
       <option value="15">15 per page</option>
@@ -123,10 +127,11 @@
       type="is-danger"
       @click="closeToast"
       v-on-clickaway="closeToast"
+      class="table__toast-button"
     />
     <div
-      class="loading-screen"
       @click.stop
+      class="loading-screen"
     >
       <b-loading
         v-model="loadingStatus" 
@@ -364,9 +369,14 @@ export default class CoinEventLogTableComponent extends Vue {
       let confirmationMessageList: string[] = [];
       for(const key in buySellEventAfterUpdateRelevantFields){
         if(buySellEventBeforeUpdateRelevantFields[key]){
+          let newMessage = ``;
           let keyConvertedToUpperCaseWords = convertFromCamelCaseToStartingUpperCaseWord(key)
-          let newMessage = `${keyConvertedToUpperCaseWords}: From ${buySellEventBeforeUpdateRelevantFields[key]} changed to ${buySellEventAfterUpdateRelevantFields[key]}`
-          confirmationMessageList.push(newMessage)
+          if(buySellEventBeforeUpdateRelevantFields[key] instanceof Date){
+            newMessage = `${keyConvertedToUpperCaseWords}:\n From ${buySellEventBeforeUpdateRelevantFields[key].toLocaleString()} to ${buySellEventAfterUpdateRelevantFields[key].toLocaleString()} \n\n`
+          }else{
+            newMessage = `${keyConvertedToUpperCaseWords}:\n From ${buySellEventBeforeUpdateRelevantFields[key]} to ${buySellEventAfterUpdateRelevantFields[key]} \n\n`
+          }
+          confirmationMessageList.push(newMessage);
         }
       }
       for(const message of confirmationMessageList){
@@ -444,13 +454,17 @@ export default class CoinEventLogTableComponent extends Vue {
           }
         }
       }
-      const successMessage = ` \n\
+      const successMessage = `
         Event ID #${this.selectedEventRow!.id!} Update Successful! \n\
-        Before Update: \n\
-        ${JSON.stringify(buySellEventBeforeUpdateRelevantFields)} \n\
-        After Update: \n\
-        ${JSON.stringify(buySellEventAfterUpdateRelevantFields)}
       `
+      // Previous successMessage, if user wishes to see changes 
+      // (requires some work as unsure how to parse the before and after data)
+        // `Event ID #${this.selectedEventRow!.id!} Update Successful! \n\
+        // Before Update: \n\
+        // ${JSON.stringify(buySellEventBeforeUpdateRelevantFields)} \n\
+        // After Update: \n\
+        // ${JSON.stringify(buySellEventAfterUpdateRelevantFields)}`
+
       // Get the updated data from the store then proceed with other following functions
       await this.getCoinEventLogTableData()
       // Update the selected event row based on id 
@@ -537,20 +551,28 @@ export default class CoinEventLogTableComponent extends Vue {
 }
 </script>
 
-<style lang="scss">
-
-.event-log-container{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 50px 90px 50px 90px;
-    & .table {
-    width: 100%;
-    & .th-wrap {
-      justify-content: center;
-    }
-  }
-
+<style lang="scss" scoped>
+.b-table {
+  @include b-tableDefault();
 }
-
+.table {
+  &__container{
+    @include tableContainer();
+  }
+  &__buttons{
+    @include eventTableButtonsDefault();
+  }
+  &__table {
+    @include tableDefault();
+  }
+  &__pagination{
+    @include paginationStyleDefault();
+  }
+  &__select-pagination{
+    @include selectPaginationStyleDefault();
+  }
+  &__toast-button{
+    @include toastButtonDefault();
+  }
+}
 </style>

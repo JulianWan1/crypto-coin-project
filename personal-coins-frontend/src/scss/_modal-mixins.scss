@@ -1,0 +1,348 @@
+// 1. Mixins For Modals
+
+// 1.1 Modal Defaults (Deals with the modal's behaviour in general)
+@mixin modalGeneralDefault(){
+  // modal-content is where we deal with the scrollbar of the modal, set overflow to hidden to hide the scrollbar
+  // .modal-content{
+  //   overflow: hidden;
+  // }
+  // Ensure that the view of the datetimepicker doesn't get restricted by the modal's size (also hides modal scrollbar apparently)
+  ::v-deep{
+    .animation-content{
+      overflow: visible !important;
+      // Set the scrollbar to be available for when in tablet/phone sideways
+      @media screen and (max-width: $modal-tablet-max-width) {
+        overflow: auto !important;
+        border-radius: 20px;
+      }
+      // Set the scrollbar to be available for when in mobile
+      @media screen and (max-width: $modal-mobile-max-width) {
+        overflow: auto !important;
+        border-radius: 20px;
+      }
+    }
+  }
+}
+
+// 1.2 For Modal Container (Not to be confused with the 1.1, this deals with what can be seen on the modal)
+@mixin modalContainerDefault(){
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: $modal-background-colour;
+  .modal-content{
+    overflow: hidden;
+  }
+  // Ensure that the datetimepicker's pop up doesn't get restricted by the modal's size
+  ::v-deep 
+  .animation-content.modal-content{
+    overflow: visible;
+  }
+}
+
+// 1.3 For Modal Details (The Modal Fields in General)
+@mixin modalDetailsDefault(){
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  padding-bottom: 25px;
+}
+
+// 1.4 For Modal Dropdown Field
+// 1.4.1 Dropdown Available
+@mixin modalDropdownFieldDefault(){
+  margin-bottom: 0.75em;
+  ::v-deep.field{
+    .label{
+      font-weight: $modal-font-weight-fields;
+      color: $modal-font-colour-fields;
+    }
+    // the colour of the dropdown's arrow
+    .select:not(.is-multiple):not(.is-loading)::after {
+      border-color: $modal-accent-colour;
+    }
+    // border of the dropdown when selected (active and focused on)
+    .select select{
+      &:focus{
+        border-color: $modal-accent-border-colour;
+      }
+      &:active{
+        border-color: $modal-accent-border-colour;
+      }
+    }
+  }
+}
+//1.4.2 No Dropdown Available
+@mixin modalNoDropdownFieldDefault(){
+  margin-bottom: 0.75em;
+  font-weight: 600;
+  color: #ff2f52;
+}
+
+// 1.5 For Modal Field (Numeric Type)
+@mixin modalNumericFieldDefault(){
+  ::v-deep
+  .label{
+    font-weight: $modal-font-weight-fields;
+    color: $modal-font-colour-fields;
+  }
+  ::v-deep
+  .input{
+    text-align: center;
+    &:focus{
+      border-color: $modal-accent-border-colour;
+    }
+    &:active{
+      border-color: $modal-accent-border-colour;
+    }
+  }
+}
+
+// 1.6 For Modal DateTime Field
+@mixin modalDateTimePickerDefault(){
+  ::v-deep
+  .label{
+    font-weight: $modal-font-weight-fields;
+    color: $modal-font-colour-fields;
+  }
+  ::v-deep{
+    .input{
+      &:active{
+        border-color: $modal-accent-border-colour;
+      }
+      &:focus{
+        border-color: $modal-accent-border-colour;
+      }
+    }
+  }
+  // Deals with the "Now" time button
+  ::v-deep{
+    .button.is-primary{
+      background-color: $modal-accent-colour;
+      font-family: $modal-font-family-general;
+      font-weight: $modal-font-weight-general;
+      &:focus:not(:active){
+        border-color: $modal-accent-border-colour;
+        box-shadow: $modal-accent-box-shadow-colour;
+      }
+    }
+    .button.is-danger{
+      font-family: $modal-font-family-general;
+      font-weight: $modal-font-weight-general;
+    }
+  }
+
+  // To set the date time dropdown menu to be center top instead of top left when opened
+  ::v-deep
+  .dropdown.dropdown-menu-animation.is-top-left.is-active.is-mobile-modal{
+    .dropdown-menu {
+      left: -200px;
+      right: unset;
+    }
+  }
+  // Retain the date time dropdown position during closing animation
+  ::v-deep
+  .dropdown.is-top-left{
+    .dropdown-menu {
+      left: -200px;
+      right: unset;
+    }
+  }
+  ::v-deep{
+    // Deals with the colour of the pagination arrows
+    .has-text-primary{
+      color: $modal-accent-colour !important;
+    }
+    // Deals with pagination-previous/next border colour when focused/selected on
+    .pagination-previous{
+      &:focus{
+        border-color: $modal-accent-border-colour;
+      }
+    }
+    .pagination-next{
+      &:focus{
+        border-color: $modal-accent-border-colour;
+      }
+    }
+    // Deals with the month & year dropdown tabs' fonts & when focused/selected on
+    .select select{
+      font-family: $modal-font-family-general;
+      font-weight: $modal-font-weight-general;
+      &:focus{
+        border-color: $modal-accent-border-colour;
+        box-shadow: $modal-accent-box-shadow-colour;
+      }
+      &:active{
+        border-color: $modal-accent-border-colour;
+        box-shadow: $modal-accent-box-shadow-colour;
+      }
+
+    }
+    // Deals with the month & year dropdown arrows
+    .select:not(.is-multiple):not(.is-loading)::after{
+      border-color: $modal-accent-colour;
+    }
+    // Deals with the colour of the present date and selected date cells highlighted on calendar
+    .datepicker .datepicker-table .datepicker-body .datepicker-cell.is-today {
+      border: solid 1px rgba(47, 137, 135, 0.5);
+    }
+    .datepicker .datepicker-table .datepicker-body .datepicker-cell.is-selected{
+      background-color: $modal-accent-colour;
+    }
+    // Deals with the size of the icons on the 
+    .icon svg{
+      height: inherit;
+    }
+  }
+}
+
+// 1.7 For Modal Fonts in General
+@mixin modalFontDefault($type){
+  @if $type == main-title {
+    font-size: $modal-font-size-title;
+    font-weight: $modal-font-weight-title;
+    color: $modal-font-colour-title;
+  }@else if $type == sub-title {
+    font-size: $modal-font-size-sub-title;
+    font-weight: $modal-font-weight-sub-title;
+    color: $modal-font-colour-sub-title;
+    // white-space is important to ensure the \n (line breaks) will show in the modal
+    // set to pre-line
+    white-space: pre-line;
+  }@else if $type == general {
+    font-size: $modal-font-size-general;
+    color: $modal-font-colour-general;
+  }
+
+}
+
+// 1.8 For Modal Buttons in General
+@mixin modalButtonsDefault{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 90px;
+  margin-right: 90px;
+  padding-left: 40px;
+  padding-right: 40px;
+
+  .submit-button{
+    width: 240px;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-image: linear-gradient($modal-button-colour-submit 0, $modal-button-colour-submit 100%);
+    opacity: $modal-button-opacity;
+    border-color: transparent;
+    color: $modal-button-wording-colour-general;
+    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+    font-family: $modal-font-family-general;
+    font-weight: $modal-font-weight-general;
+    &:disabled{
+      opacity: $modal-button-opacity-disabled;
+      border-color: transparent;
+      color: $modal-button-wording-colour-disabled;
+    }
+    &:disabled:hover{
+      opacity: $modal-button-opacity-disabled;
+      border-color: transparent;
+      color: $modal-button-wording-colour-disabled;
+    }
+    &:not(:disabled):hover{
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: transparent;
+      color: $modal-button-wording-colour-general;
+    }
+    &:focus{
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: $modal-button-border-colour-submit;
+      box-shadow: $modal-button-box-shadow-colour-submit;
+      color: $modal-button-wording-colour-general;
+    }
+    &:focus:not(:active){
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: $modal-button-border-colour-submit;
+      box-shadow: $modal-button-box-shadow-colour-submit;
+      color: $modal-button-wording-colour-general;
+    }
+  }
+
+  .cancel-button{
+    width: 240px;
+    border-radius: 5px;
+    padding: 10px;
+    background-image: linear-gradient($modal-accent-colour 0, $modal-accent-colour 100%);
+    opacity: $modal-button-opacity;
+    border-color: transparent;
+    color: $modal-button-wording-colour-general;
+    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+    font-family: $modal-font-family-general;
+    font-weight: $modal-font-weight-general;
+    &:hover{
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: transparent;
+      color: $modal-button-wording-colour-general;
+    }
+    &:focus{
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: $modal-accent-border-colour;
+      box-shadow: $modal-accent-box-shadow-colour;
+      color: $modal-button-wording-colour-general;
+    }
+    &:focus:not(:active){
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: $modal-accent-border-colour;
+      box-shadow: $modal-accent-box-shadow-colour;
+      color: $modal-button-wording-colour-general;
+    }
+  }
+
+  .delete-button{
+    width: 240px;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-image: linear-gradient($modal-button-colour-delete 0, $modal-button-colour-delete 100%);
+    opacity: $modal-button-opacity;
+    border-color: transparent;
+    color: $modal-button-wording-colour-general;
+    transition: all .3s cubic-bezier(.05, .03, .35, 1);
+    font-family: $modal-font-family-general;
+    font-weight: $modal-font-weight-general;
+    &:hover{
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: transparent;
+      color: $modal-button-wording-colour-general;
+    }
+    &:focus{
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: $modal-button-border-colour-delete;
+      box-shadow: $modal-button-box-shadow-colour-delete;
+      color: $modal-button-wording-colour-general;
+    }
+    &:focus:not(:active){
+      opacity: $modal-button-opacity-focus-hover-active;
+      border-color: $modal-button-border-colour-delete;
+      box-shadow: $modal-button-box-shadow-colour-delete;
+      color: $modal-button-wording-colour-general;
+    }
+  }
+
+}
+
+// 1.8.1 Template of style for button in general (if not using b-button from buefy)
+// remember to change .button to the class name of the button
+  // .button{
+  // border-radius: 10px;
+  // padding: 10px;
+  // background-color: red;
+  // color: white;
+  // border-color: rgba(0, 0, 80, 0.05);
+  // cursor: pointer;
+  // &:hover{
+  //   background-color: blue;
+  // }
+// }
+

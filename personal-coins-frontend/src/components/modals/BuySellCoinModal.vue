@@ -3,12 +3,14 @@
     :active="isActive"
     :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeModalFunction"
+    width="550px"
+    class="modal"
   >
-    <div class="buy-sell-coin-modal-container">
-      <div class="buy-sell-coinName">
+    <div class="modal__container">
+      <div class="modal__title">
         {{selectedBuyOrSellOption === 'buy'? "Buy" : "Sell"}} {{coinName}}
       </div>
-      <div class="buy-sell-dropdown">
+      <div class="modal__dropdown">
         <b-field label="Buy or Sell">
           <b-select
            v-model="selectedBuyOrSellOption"
@@ -21,21 +23,21 @@
       <CoinDetailsModalComponent
         @retrievePartialCoinModalDetails="updateMainCoinModal"
       />
-      <div class="modal-buttons">
-        <button 
+      <div class="modal__buttons">
+        <b-button 
+          class="submit-button"
+          :disabled="buySellButtonStatusIsDisabled"
+          @click="submitBuySellCoinMethod"
+        >
+          {{selectedBuyOrSellOption === 'buy'? "Buy" : "Sell"}}
+        </b-button>
+        <b-button 
           class="cancel-button"
           :disabled="loadingStatus"
           @click="closeModalFunction"  
         >
           Cancel
-        </button>
-        <button 
-          class="update-button"
-          :disabled="buySellButtonStatusIsDisabled"
-          @click="submitBuySellCoinMethod"
-        >
-          {{selectedBuyOrSellOption === 'buy'? "Buy" : "Sell"}}
-        </button>
+        </b-button>
       </div>
     </div>
   </b-modal>
@@ -118,10 +120,21 @@ export default class BuySellCoinModal extends Vue {
 }
 </script>
 
-<style lang="scss">
-.buy-sell-coin-modal-container{
-    display:flex;
-    flex-direction: column;
-    background-color: white;
-  } 
+<style lang="scss" scoped>
+.modal{
+  @include modalFontDefault(general);
+  @include modalGeneralDefault();
+  &__container{
+    @include modalContainerDefault();
+  }
+  &__title{
+    @include modalFontDefault(main-title);
+  }
+  &__dropdown{
+    @include modalDropdownFieldDefault();
+  }
+  &__buttons{
+    @include modalButtonsDefault();
+  }
+}
 </style>

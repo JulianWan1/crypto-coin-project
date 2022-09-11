@@ -1,7 +1,7 @@
 <template>
-  <div class="coin-details-modal-component-container">
+  <div class="modal-fields">
     <b-field 
-      class="field-quantity"
+      class="modal-fields__numeric-field"
       label="Quantity"
       message="accepts up to 6 integers and 6 decimal places"
     >
@@ -12,7 +12,7 @@
       />
     </b-field>
     <b-field 
-      class="field-market-price"
+      class="modal-fields__numeric-field"
       label="Market Price"
       message="accepts up to 8 integers and 2 decimal places"
     >
@@ -23,7 +23,7 @@
       />
     </b-field>
     <b-field 
-      class="field-network-fee"
+      class="modal-fields__numeric-field"
       label="Network Fee"
       message="accepts up to 8 integers and 2 decimal places"
     >
@@ -34,7 +34,7 @@
       />
     </b-field>
     <b-field 
-      class="field-exchange-premium"
+      class="modal-fields__numeric-field"
       label="Exchange Premium"
       message="accepts up to 8 integers and 2 decimal places"
     >
@@ -45,7 +45,7 @@
       />
     </b-field>
     <b-field 
-      class="field-time-dropdown"
+      class="modal-fields__date-time"
       label="Date and Time"
     >
       <b-datetimepicker 
@@ -53,7 +53,7 @@
         v-model="partialCoinModalDetails.dateTime"
         @input="detectValueFromField($event)"
         placeholder="Click to select..."
-        position="is-top-right"
+        position="is-top-left"
         horizontal-time-picker
       >
         <template #left>
@@ -214,6 +214,15 @@ export default class CoinDetailsModalComponent extends Vue{
 
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+  .modal-fields{
+    @include modalDetailsDefault();
+    &__numeric-field{
+      @include modalNumericFieldDefault();
+    }
+    &__date-time{
+      @include modalDateTimePickerDefault();
+    }
+  }
 
 </style>

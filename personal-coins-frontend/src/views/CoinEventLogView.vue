@@ -1,9 +1,11 @@
 <template>
   <div class="home">
-    <h1>{{coinNameRetrieved.toUpperCase()}} EVENT LOGS</h1>
+    <h1 class="home__title">{{coinNameRetrieved[0].toUpperCase() + coinNameRetrieved.slice(1)}} Event Logs</h1>
     <CoinEventLogTableComponent
     :coinName="coinNameRetrieved"
     />
+    <h3 class="home__author">Julian, 2022</h3>
+    <h3 class="home__credits">powered by: LiveCoinWatch</h3>
   </div>
 </template>
 
@@ -25,4 +27,8 @@ export default class CoinEventLogView extends Vue {
 
 </script>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.home{
+  @include viewDefaultStyle();
+}
+</style>

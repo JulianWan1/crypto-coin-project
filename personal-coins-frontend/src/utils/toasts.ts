@@ -6,7 +6,6 @@ export function successToastMethod(successToast:null|BNoticeComponent, message:s
     indefinite: true,
     message: message,
     type:'is-success',
-    position:"is-top-right"
   })
 }
 

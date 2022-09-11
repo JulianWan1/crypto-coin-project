@@ -3,13 +3,15 @@
     :active="isActive"
     :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeModalFunction"
+    width="550px"
+    class="modal"
   >
-    <div class="add-new-coin-modal-container">
-      <div class="modal-title">
+    <div class="modal__container">
+      <div class="modal__title">
         Add New Coin
       </div>
       <div 
-        class="add-new-coin-dropdown"
+        class="modal__dropdown"
         v-if="selectedCoinOptionName"
       >
         <b-field label="Coin Name">
@@ -28,7 +30,7 @@
         </b-field>
       </div>
       <div 
-        class="no-new-coins-available-notification"
+        class="modal__no-dropdown-available"
         v-if="!selectedCoinOptionName"
       >
         No New Coins Available for Purchase
@@ -36,21 +38,21 @@
       <CoinDetailsModalComponent
         @retrievePartialCoinModalDetails="updateMainCoinModal"
       />
-      <div class="modal-buttons">
-        <button 
+      <div class="modal__buttons">
+        <b-button 
+          class="submit-button"
+          :disabled="submitAddCoinButtonStatusIsDisabled"
+          @click="addNewCoinMethod"
+        >
+          Add
+        </b-button>
+        <b-button 
           class="cancel-button"
           :disabled="loadingStatus"
           @click="closeModalFunction"  
         >
           Cancel
-        </button>
-        <button 
-          class="add-new-coin-button"
-          :disabled="submitAddCoinButtonStatusIsDisabled"
-          @click="addNewCoinMethod"
-        >
-          Add
-        </button>
+        </b-button>
       </div>
     </div>
   </b-modal>
@@ -189,10 +191,24 @@ export default class AddNewCoinModal extends Vue {
 
 </script>
 
-<style lang="scss">
-.add-new-coin-modal-container{
-    display:flex;
-    flex-direction: column;
-    background-color: white;
-  } 
+<style lang="scss" scoped>
+.modal{
+  @include modalFontDefault(general);
+  @include modalGeneralDefault();
+  &__container{
+    @include modalContainerDefault();
+  }
+  &__title{
+    @include modalFontDefault(main-title);
+  }
+  &__dropdown{
+    @include modalDropdownFieldDefault();
+  }
+  &__no-dropdown-available{
+    @include modalNoDropdownFieldDefault();
+  }
+  &__buttons{
+    @include modalButtonsDefault();
+  }
+}
 </style>
