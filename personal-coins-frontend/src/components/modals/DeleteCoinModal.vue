@@ -3,30 +3,32 @@
     :active="isActive"
     :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeModalFunction"
+    width="800px"
+    class="modal"
   >
     <div
-      class="delete-coin-modal-container"
+      class="modal__container"
     >
-      <div class="delete-coin-warning-message">
+      <div class="modal__title">
         Confirm delete {{coinName}} from your portfolio?
         <br>
         Action is IRREVERSIBLE and all event history will be LOST 
       </div>
-      <div class="modal-buttons">
-        <button 
+      <div class="modal__buttons">
+        <b-button 
+          class="delete-button"
+          :disabled="loadingStatus"
+          @click="deleteCoinMethod"
+        >
+          Delete
+        </b-button>
+        <b-button 
           class="cancel-button"
           :disabled="loadingStatus"
           @click="closeModalFunction"  
         >
           Cancel
-        </button>
-        <button 
-          class="delete-coin-button"
-          :disabled="loadingStatus"
-          @click="deleteCoinMethod"
-        >
-          Delete
-        </button>
+        </b-button>
       </div>
     </div>
   </b-modal>
@@ -57,9 +59,17 @@ export default class DeleteCoinModal extends Vue {
 </script>
 
 <style lang="scss">
-.delete-coin-modal-container{
-    display:flex;
-    flex-direction: column;
-    background-color: white;
-  } 
+.modal{
+  @include modalFontDefault(general);
+  @include modalGeneralDefault();
+  &__container{
+    @include modalContainerDefault();
+  }
+  &__title{
+    @include modalFontDefault(sub-title);
+  }
+  &__buttons{
+    @include modalButtonsDefault();
+  }
+}
 </style>

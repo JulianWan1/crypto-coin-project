@@ -1,34 +1,38 @@
 <template>
-  <div class="portfolio-container">
-    <div class="buttons-container">
+  <div class="table__container">
+    <div class="table__buttons">
       <div 
-        class="no-coin-selected-button"
+        class="table__buttons__no-coin-selected-button"
         v-if="!selectedCoinRow"
       >
         <b-button
           @click="changeAddNewCoinModalStatus"
+          class="button__new-coin"
         >
           New Coin +
         </b-button>
       </div>
       <div 
-        class="coin-selected-buttons"
+        class="table__buttons__coin-selected-buttons"
         v-if="selectedCoinRow"
         @click.stop
       >
         <b-button
         @click="changeBuySellModalStatus"
+        class="button__buy-sell"
         >
           Buy/Sell
         </b-button>
         <b-button
           tag="router-link"
           :to="{ name: 'CoinEvents', params: {coinName:`${selectedCoinRow.coinName.toLowerCase()}`} }"
+          class="button__view-log"
         >
           View Log
         </b-button>
         <b-button
         @click="changeDeleteCoinModalStatus"
+        class="button__delete"
         >
           Delete
         </b-button>
@@ -77,7 +81,7 @@
       :default-sort="['currentAmountOwned', 'desc']"
       v-on-clickaway="deselectRowMethod"
       focusable
-      class="table"
+      class="table__table"
     >
       <b-table-column 
         field="id" 
@@ -135,8 +139,9 @@
       </b-table-column>
       <b-table-column
         field="unrealisedProfitLossPercentage"
-        label="Unrealised Profit Loss Percentage"
+        label="Unrealised Profit Loss Percentage (%)"
         v-slot="props"
+        :td-attrs="unrealisedProfitLossPercentageTextColour"
       >
         {{ 
           props.row.unrealisedProfitLossPercentage ? 
@@ -147,6 +152,7 @@
         field="realisedProfitLossPercentage"
         label="Realised Profit Loss Percentage (%)"
         v-slot="props"
+        :td-attrs="realisedProfitLossPercentageTextColour"
       >
         {{ parseFloat((props.row.realisedProfitLossPercentage * 100).toFixed(3)) }}
       </b-table-column>
@@ -185,6 +191,7 @@
       type="is-danger"
       @click="closeToast"
       v-on-clickaway="closeToast"
+      class="table__toast-button"
     />
     <div 
       class="loading-screen"
@@ -228,8 +235,8 @@ export default class CoinTableComponent extends Vue {
   portfolioCoinList: Array<Coin> = [];
   setAPICallTime: number = 1000 * 60 * 10 // milliseconds
   selectedCoinRow: Coin | null = null;
-  selectedRowCoinName = 'placeHolderCoinName';
-  selectedRowCoinCode = 'placeHolderCoinCode';
+  selectedRowCoinName = '';
+  selectedRowCoinCode = '';
   liveCoinWatchFunctions = new LiveCoinWatchFunctions;
   isBuySellModalActive = false;
   isAddNewCoinModalActive = false;
@@ -318,10 +325,12 @@ export default class CoinTableComponent extends Vue {
     if(this.selectedCoinRow){
       this.selectedRowCoinName = this.selectedCoinRow.coinName;
       this.selectedRowCoinCode = this.selectedCoinRow.coinCode;
-    }else{
-      this.selectedRowCoinName = 'placeHolderCoinName';
-      this.selectedRowCoinCode = 'placeHolderCoinCode';
     }
+    // else{
+    //   // NEED TO CHECK THIS BEHAVIOUR (CAUSING A UI BUG WHERE WHEN CLOSING MODAL, COINNAME OR CODE GETS REPLACED WITH THIS FOR A SECOND)
+    //   this.selectedRowCoinName = 'placeHolderCoinName';
+    //   this.selectedRowCoinCode = 'placeHolderCoinCode';
+    // }
   }
 
   // 1. Functions for buy/sell Modal
@@ -544,29 +553,43 @@ export default class CoinTableComponent extends Vue {
     }
   }
 
-}
-</script>
-
-<style lang="scss">
-.portfolio-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 50px 90px 50px 90px;
-  & .table {
-    width: 100%;
-    & .th-wrap {
-      justify-content: center;
+  // Methods that deals with dynamic table text colour for:
+  // - unrealised profit loss percentage
+  unrealisedProfitLossPercentageTextColour(row:any, column:any){
+    if(column.label === 'Unrealised Profit Loss Percentage (%)'){
+      return row.unrealisedProfitLossPercentage && row.unrealisedProfitLossPercentage == 0 ? 
+        {style: {color: 'white'}} : 
+        row.unrealisedProfitLossPercentage && row.unrealisedProfitLossPercentage < 0 ? 
+          {style: {color: 'red'}} : 
+          {style: {color: 'springgreen'}}
+    }
+  }
+  // - realised profit loss percentage
+  realisedProfitLossPercentageTextColour(row:any, column:any){
+    if(column.label === 'Realised Profit Loss Percentage (%)'){
+      return row.realisedProfitLossPercentage && row.realisedProfitLossPercentage == 0 ? 
+        {style: {color: 'white'}} : 
+        row.realisedProfitLossPercentage && row.realisedProfitLossPercentage < 0 ? 
+          {style: {color: 'red'}} : 
+          {style: {color: 'springgreen'}}
     }
   }
 }
+</script>
 
-.buttons-container {
-  display: flex;
-  margin-bottom: 30px;
-}
-
-.svg {
-  height:15px;
+<style lang="scss" scoped>
+.table {
+  &__container{
+    @include tableContainer();
+  }
+  &__buttons{
+    @include coinTableButtonsDefault();
+  }
+  &__table {
+    @include tableDefault();
+  }
+  &__toast-button{
+    @include toastButtonDefault();
+  }
 }
 </style>

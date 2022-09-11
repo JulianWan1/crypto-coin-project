@@ -3,39 +3,39 @@
     :active="isActive"
     :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeModalFunction"
+    width="550px"
+    class="modal"
   >
     <div
-      class="update-coin-event-modal-container"
+      class="modal__container"
     >
-      <div class="coin-name">
-        {{coinName.toUpperCase()}}
+      <div class="modal__title">
+        {{`${coinName[0].toUpperCase() + coinName.slice(1)}`}}
       </div>
-      <div class="event-details">
+      <div class="modal__sub-title">
         Event id #{{eventId}}: {{eventType}} Event 
       </div>
-      <div class="coin-details">
         <CoinDetailsModalComponent
           :updateEventModalType="true"
           :coinEventDetails="mainCoinModalDetails"
           :eventDateFromSelectedEvent="eventDateFromSelectedEvent"
           @retrievePartialCoinModalDetails="updateMainCoinModal"
         />
-      </div>
-      <div class="modal-buttons">
-        <button 
+      <div class="modal__buttons">
+        <b-button 
+          class="submit-button"
+          :disabled="updateButtonStatusIsDisabled"
+          @click="submitDataToCoinEventLogTableComponent"
+        >
+          Update
+        </b-button>
+        <b-button 
           class="cancel-button"
           :disabled="loadingStatus"
           @click="closeModalFunction"
         >
           Cancel
-        </button>
-        <button 
-          class="update-button"
-          :disabled="updateButtonStatusIsDisabled"
-          @click="submitDataToCoinEventLogTableComponent"
-        >
-          Update
-        </button>
+        </b-button>
       </div>
     </div>
   </b-modal>
@@ -146,10 +146,21 @@ export default class UpdateCoinEventModal extends Vue {
 
 </script>
 
-<style lang="scss">
-  .update-coin-event-modal-container{
-    display:flex;
-    flex-direction: column;
-    background-color: white;
-  } 
+<style lang="scss" scoped>
+.modal{
+  @include modalFontDefault(general);
+  @include modalGeneralDefault();
+  &__container{
+    @include modalContainerDefault();
+  }
+  &__title{
+    @include modalFontDefault(main-title);
+  }
+  &__sub-title{
+    @include modalFontDefault(sub-title);
+  }
+  &__buttons{
+    @include modalButtonsDefault();
+  }
+}
 </style>

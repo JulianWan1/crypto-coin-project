@@ -3,29 +3,31 @@
     :active="isActive"
     :can-cancel="[`${loadingStatus?'':'escape'}`, `${loadingStatus?'':'outside'}`]"
     :on-cancel="closeConfirmationModal"
+    width="800px"
+    class="modal"
   >
-    <div class="update-coin-event-confirmation-modal-container">
-      <div class="update-confirmation-title">
+    <div class="modal__container">
+      <div class="modal__title">
         Confirm Update(s) for Event ID #{{eventId}}?
       </div>
-      <div class="update-confirmation-message">
+      <div class="modal__sub-title">
       {{updateMessage}}
       </div>
-      <div class="modal-buttons">
-        <button 
-          class="back-to-modal-button"
-          :disabled="loadingStatus"
-          @click="closeConfirmationModal"
-        >
-          Back to Modal
-        </button>
-        <button 
-          class="confirm-update-button"
+      <div class="modal__buttons">
+        <b-button 
+          class="submit-button"
           :disabled="loadingStatus"
           @click="triggerUpdateConfirmation"
         >
           Confirm
-        </button>
+        </b-button>
+        <b-button 
+          class="cancel-button"
+          :disabled="loadingStatus"
+          @click="closeConfirmationModal"
+        >
+          Back to Modal
+        </b-button>
       </div>
     </div>
   </b-modal>
@@ -64,10 +66,21 @@ export default class UpdateCoinEventConfirmationModal extends Vue {
 }
 </script>
 
-<style lang="scss">
-.update-coin-event-confirmation-modal-container{
-  display: flex;
-  flex-direction: column;
-  background-color: white;
+<style lang="scss" scoped>
+.modal{
+  @include modalFontDefault(general);
+  @include modalGeneralDefault();
+  &__container{
+    @include modalContainerDefault();
+  }
+  &__title{
+    @include modalFontDefault(main-title);
+  }
+  &__sub-title{
+    @include modalFontDefault(sub-title);
+  }
+  &__buttons{
+    @include modalButtonsDefault();
+  }
 }
 </style>

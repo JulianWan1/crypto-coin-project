@@ -1,0 +1,40 @@
+// 3. Mixins For Pages
+
+// 3.1 For General Page Design Setting
+@mixin pageDefaultStyle(){
+  text-align: center;
+  // Crucial to ensure the height of the app fills out the whole page
+  height: 100vh;
+  font-family: $page-default-font;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: $page-default-font-colour;
+  background-color: $page-default-background-colour;
+  .home{
+    // Crucial to set home's background colour the same as the app
+    // to ensure when scrolling down the page (when devtools are open at bottom), 
+    // bg colour won't mismatch (white colour at bottom)
+    background-color: $page-default-background-colour;
+  }
+}
+
+@mixin viewDefaultStyle(){
+  &__title{
+    // tablet screen width range (1023px ~ 625px)
+    @media screen and (max-width: $pages-tablet-max-width){
+      font-size: 70px;
+    }
+    // mobile screen up to 625px
+    @media screen and (max-width: $pages-mobile-max-width){
+      font-size: 60px;
+      text-align: center;
+      margin-left: unset;
+    }
+    font-size: 80px;
+    font-weight: bolder;
+    text-align: left;
+    margin-left: 90px;
+    padding-top: 20px;
+  }
+}
