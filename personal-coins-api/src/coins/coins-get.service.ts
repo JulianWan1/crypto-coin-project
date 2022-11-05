@@ -8,7 +8,7 @@ import { MainPagePortfolio } from "src/models/coin-related.model";
 
 @Injectable()
 export class CoinsGetService{
-  private logger = new Logger('CoinsDeleteService');
+  private logger = new Logger('CoinsGetService');
 
   // 1. Function to get all coins from portfolio
   async getAllPortfolioCoins(){
