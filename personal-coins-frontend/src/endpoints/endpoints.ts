@@ -1,6 +1,6 @@
 export enum Endpoints {
   Coins = "/coins",
-  LiveCoinWatchSingleCoinEndpoint = "/coins/single",
+  CurrentCoinMarketPrice = "/coins/marketValue",
   UpdateCoinEvent = "/coins/update",
   DeleteCoinOrCoinEvent = "/coins/delete"
 }

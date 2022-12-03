@@ -1,7 +1,7 @@
 import { Endpoints } from "@/endpoints/endpoints";
 import { LiveCoinWatchSingleCoinRequest, UnrealisedProfitLossPercentageCalculatorResponse } from "@/models/api-related-model";
 import { Coin } from "@/models/table.model";
-import { liveCoinWatchAxios } from "@/utils/axios";
+import { axios } from "@/utils/axios";
 
 export class LiveCoinWatchFunctions {
   // To calculate the unrealised profit and loss percentage of a coin
@@ -14,11 +14,11 @@ export class LiveCoinWatchFunctions {
     } = coinObject;
     // Set the request body for the API call to livecoinwatch
     // liveCoinWatchAxios is an instance of axios that already has the necessary baseURL and header set to make a complete call
-    const singleCoinRequestBody: LiveCoinWatchSingleCoinRequest = {
-      "currency": "USD",
-      "code": `${coinCode}`,
-      "meta": true
-    }
+    // const singleCoinRequestBody: LiveCoinWatchSingleCoinRequest = {
+    //   "currency": "USD",
+    //   "code": `${coinCode}`,
+    //   "meta": true
+    // }
     // Make LiveCoinWatch API request (LiveCoinWatchAPIs only take POST requests (13/06/2022))
     let marketPriceAndProfitLossPercentage: UnrealisedProfitLossPercentageCalculatorResponse  = {
       currentCoinMarketPrice: null,
@@ -26,10 +26,11 @@ export class LiveCoinWatchFunctions {
     }
     try {
       const apiCall = async() => {
-        const response = await liveCoinWatchAxios.post(
-          Endpoints.LiveCoinWatchSingleCoinEndpoint,
-          singleCoinRequestBody
-        );
+        const response = await axios.get(`${Endpoints.CurrentCoinMarketPrice}/${coinCode}`)
+        // const response = await liveCoinWatchAxios.post(
+        //   Endpoints.LiveCoinWatchSingleCoinEndpoint,
+        //   singleCoinRequestBody
+        // );
         return response.data;
       }
       // Retrieve data from the API call

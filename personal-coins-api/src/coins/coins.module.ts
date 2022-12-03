@@ -12,6 +12,7 @@ import { CoinsEventUpdateService } from './coins-event-update.service';
 import { CoinsEventDeleteService } from './coins-event-delete.service';
 import { CoinsDeleteService } from './coins-delete.service';
 import { CoinsGetService } from './coins-get.service';
+import { CoinsLiveCoinWatchService } from './coins-livecoinwatch.service';
 
 @Module({
   controllers: [CoinsController],
@@ -23,6 +24,7 @@ import { CoinsGetService } from './coins-get.service';
     CoinsEventDeleteService,
     CoinsDeleteService,
     CoinsGetService,
+    CoinsLiveCoinWatchService,
     GeneralBuyEvent,
     GeneralSellEvent,
     GeneralDCADefiningEvent,

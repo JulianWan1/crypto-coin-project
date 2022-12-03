@@ -7,6 +7,7 @@ import { CoinsDeleteService } from './coins-delete.service';
 import { CoinsEventDeleteService } from './coins-event-delete.service';
 import { CoinsEventUpdateService } from './coins-event-update.service';
 import { CoinsGetService } from './coins-get.service';
+import { CoinsLiveCoinWatchService } from './coins-livecoinwatch.service';
 import { CoinsNewService } from './coins-new-coin.service';
 import { CoinsSellService } from './coins-sell.service';
 
@@ -20,7 +21,8 @@ export class CoinsController {
     private readonly coinsEventUpdateService: CoinsEventUpdateService,
     private readonly coinsEventDeleteService: CoinsEventDeleteService,
     private readonly coinsDeleteService: CoinsDeleteService,
-    private readonly coinsGetService: CoinsGetService
+    private readonly coinsGetService: CoinsGetService,
+    private readonly coinsLiveCoinWatchService: CoinsLiveCoinWatchService
     ){}
 
   @Post('/')
@@ -88,7 +90,9 @@ export class CoinsController {
   // Get all the coins from the Portfolio table
   @Get('/')
   async getAllCoins():Promise<MainPagePortfolio[]>{
+
     return await this.coinsGetService.getAllPortfolioCoins()
+
   }
 
   // Get all the events for a specific coin
@@ -96,7 +100,18 @@ export class CoinsController {
   async getAllSpecificCoinEvents(
     @Param('coinName') coinName: string
   ){
+
     return await this.coinsGetService.getAllCoinEvents(coinName)
+
+  }
+
+  @Get('marketValue/:coinCode')
+  async getCurrentCoinMarketValues(
+    @Param('coinCode') coinCode: string
+  ){
+
+    return await this.coinsLiveCoinWatchService.getCurrentCoinMarketValue(coinCode)
+
   }
 
 }
