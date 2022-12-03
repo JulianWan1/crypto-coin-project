@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+
+  coin_app_frontend:
+    build:
+      context: ./personal-coins-frontend/
+      dockerfile: .personal-coins-frontend-development.Dockerfile
+    # image: booleanwan/crypto-coin-app-frontend:v1.0
+    env_file:
+      - ./personal-coins-frontend/.env
+    working_dir: /app
+    ports:
+      - '8080:8080'
+    container_name: coin_app_frontend
+    volumes:
+      - ./personal-coins-frontend:/app
+      - /app/node_modules
+    environment: 
+      - CHOKIDAR_USEPOLLING=true
+    networks:
+      - coin_network
+  coin_app_api:
+    build:
+      context: ./personal-coins-api/
+      dockerfile: .personal-coins-api-development.Dockerfile
+    # image: booleanwan/crypto-coin-app-api:v1.0
+    env_file:
+      - ./personal-coins-api/.env
+    depends_on:
+      - personal-coin-pg-db
+    working_dir: /app
+    ports:
+      - '4000:4000'
+    container_name: coin_app_api
+    volumes:
+      - ./personal-coins-api:/app 
+      - /app/node_modules
+    networks:
+      - coin_network
+  personal-coin-pg-db:
+    # image: postgres:11.9-alpine
+    image: booleanwan/crypto-coin-app-postgres-db:multi-11.9-alpine
+    ports:
+      - '5005:5432'
+    environment:
+      POSTGRES_USER: julian
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: personal-coin-pg-db
+    container_name: personal-coin-pg-db
+    volumes:
+      - coin_db_data:/var/lib/postgresql/data
+    networks:
+      - coin_network
+
+volumes:
+  coin_db_data:
+
+networks:
+  coin_network:
+
+
+  

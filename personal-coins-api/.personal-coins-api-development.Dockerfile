@@ -8,8 +8,4 @@ RUN yarn
 
 COPY . .
 
-ARG PORT
-
-EXPOSE ${PORT}
-
 CMD yarn && yarn start:dev

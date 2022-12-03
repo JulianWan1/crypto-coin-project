@@ -38,3 +38,9 @@ export class ExistingCoins {
   coinName: string;
   coinCode: string
 }
+
+export interface LiveCoinWatchSingleCoinRequest {
+	currency: string,
+	code: string,
+	meta: boolean
+}

@@ -8,11 +8,11 @@ const axiosConfig: AxiosRequestConfig = {
 };
 
 // Setting the axios configuration for livecoinwatch API call
-const liveCoinWatchAxiosConfig: AxiosRequestConfig = {
-  baseURL: process.env.VUE_APP_LIVECOINWATCH_API_BASE_URL,
-  headers: {'x-api-key': `${process.env.VUE_APP_LIVECOINWATCH_API_KEY}`},
-  timeout: 1000 * 60, // 1 minute
-};
+// const liveCoinWatchAxiosConfig: AxiosRequestConfig = {
+//   baseURL: process.env.VUE_APP_LIVECOINWATCH_API_BASE_URL,
+//   headers: {'x-api-key': `${process.env.VUE_APP_LIVECOINWATCH_API_KEY}`},
+//   timeout: 1000 * 60, // 1 minute
+// };
 
 // TODO: Understand the requestInterceptor, responseInterceptor & errorInterceptor
 
@@ -43,11 +43,14 @@ const liveCoinWatchAxiosConfig: AxiosRequestConfig = {
 
 // create the general axios instance for self made API
 const instance = Axios.create(axiosConfig);
+
 // create the livecoinwatch axios instance for livecoinwatch API
-const liveCoinWatchInstance = Axios.create(liveCoinWatchAxiosConfig);
+// const liveCoinWatchInstance = Axios.create(liveCoinWatchAxiosConfig);
+
 // instance.interceptors.request.use(requestInterceptor);
 // instance.interceptors.response.use(responseInterceptor(), errorInterceptor());
 
 // Exporting the axios instances 
 export const axios = instance;
-export const liveCoinWatchAxios = liveCoinWatchInstance
+
+// export const liveCoinWatchAxios = liveCoinWatchInstance
